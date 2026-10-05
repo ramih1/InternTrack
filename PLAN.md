@@ -70,7 +70,7 @@ InternTrack is a web app for students that finds internships, co-ops, and studen
 └────────────────────────────┘
 ```
 
-- **Frontend/API:** Next.js (App Router) + TypeScript, Tailwind, shadcn/ui.
+- **Frontend/API:** Next.js (App Router) + TypeScript, Tailwind, shadcn/ui. Hosted on Vercel; screens designed in Figma (see section 7).
 - **DB/Auth/Storage:** Supabase. RLS on every user-owned table.
 - **Background jobs:** a separate long-running Node worker (Playwright can't run in Vercel serverless functions). Queue via a `jobs_queue` table polled by the worker, or Inngest/Trigger.dev.
 - **AI:** Anthropic TypeScript SDK (`@anthropic-ai/sdk`).
@@ -146,16 +146,37 @@ InternTrack is a web app for students that finds internships, co-ops, and studen
 
 ---
 
-## 7. Kickoff prompt for Claude Code
+## 7. Dev tooling (Claude connectors & plugins)
+
+These are connected to the Claude account and available to Claude Code sessions while building InternTrack.
+
+| Tool | Status | Use in this project |
+|---|---|---|
+| **Supabase** connector | Connected | Create the project, apply SQL migrations, generate TypeScript types, run security/performance advisors, read logs. Primary DB/auth/storage tool. |
+| **Vercel** connector | Connected | Link the GitHub repo to a Vercel project, set environment variables, read build/runtime logs, preview and production deploys. |
+| **Figma** connector | Connected | Mock up key screens (job board, match view, tracker Kanban, apply review) and turn Figma frames into code; keep a small design system (colors, type, components). |
+| **Canva** connector | Connected | Non-code assets: logo, landing-page graphics, social posts, pitch deck. Optional. |
+| **Stripe** connector | Not finished connecting | Needed only for Milestone 9 (billing). Finish connecting at claude.ai/customize/connectors before then. |
+| Plugins (frontend-design, Backend Design, supabase, stripe, playwright, code-review, securitymaxxing) | Not enabled yet | Enable from the plugin catalog if wanted: playwright for testing the UI and the apply agent, code-review/securitymaxxing before each merge. |
+
+Rules for using them:
+- Ask before creating anything that costs money (paid Supabase plan, Vercel paid features, domains, Stripe live mode).
+- Schema changes go through migration files committed to the repo (`supabase/migrations/`), then are applied with the Supabase connector, never ad-hoc SQL on production.
+- Run Supabase advisors after every migration and fix security warnings (missing RLS, exposed tables).
+
+---
+
+## 8. Kickoff prompt for Claude Code
 
 Paste this into a new Claude Code session in this repo to start building:
 
-> Read `PLAN.md`. We're building InternTrack, starting with **Milestone 1 (Foundation)** and **Milestone 2 (Job board)**.
+> Read `PLAN.md`. We're building InternTrack, starting with **Milestone 1 (Foundation)** and **Milestone 2 (Job board)**. Use the Supabase and Vercel connectors described in section 7; ask me before creating anything that costs money.
 >
 > 1. Scaffold a Next.js (App Router) + TypeScript app with Tailwind and shadcn/ui, ESLint, Prettier, and Vitest.
-> 2. Set up Supabase: SQL migrations for `companies`, `jobs`, `job_sources`, and `profiles` from section 3, with Row Level Security. Add Supabase auth (email + Google).
+> 2. Supabase: using the Supabase connector, create (or reuse) an `interntrack` project on the free tier. Write SQL migrations in `supabase/migrations/` for `companies`, `jobs`, `job_sources`, and `profiles` from section 3, with Row Level Security; apply them, generate TypeScript types into the repo, and run the advisors and fix any warnings. Add Supabase auth (email + Google).
 > 3. Build an ingestion module that pulls intern/co-op postings from the Greenhouse, Lever, and Ashby public job-board APIs for a seed list of companies in `data/companies.json`, de-duplicates them, and stores them. Normalize each listing with the Anthropic TypeScript SDK (`claude-opus-5-5`, structured outputs, effort `low`) into the fields in section 1.1.
-> 4. Build the job board page: list + filters (location, remote, term, field, posted within N days), job detail page with source links and AI summary.
+> 4. Build the job board page: list + filters (location, remote, term, field, posted within N days), job detail page with source links and AI summary. If I've shared a Figma link for these screens, build from it with the Figma connector.
 > 5. Add a script/cron to refresh listings daily and mark closed ones.
+> 6. Vercel: using the Vercel connector, link this GitHub repo to a Vercel project, set the environment variables (Supabase URL/keys, `ANTHROPIC_API_KEY`) — ask me for any secret values — and get a preview deployment building. Check the build logs and fix failures.
 >
-> Keep secrets in `.env.local` (add `.env.example`). Write tests for the ingestion parsers. Run lint, typecheck, and tests before finishing, and show me the app running.
+> Keep secrets in `.env.local` (add `.env.example`, never commit real keys). Write tests for the ingestion parsers. Run lint, typecheck, and tests before finishing, and show me the app running.
