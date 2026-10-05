@@ -1,0 +1,38 @@
+[
+  {
+    "additionalPlain": "We are an equal opportunity employer.",
+    "additional": "<div>We are an equal opportunity employer.</div>",
+    "categories": {
+      "commitment": "Intern",
+      "department": "Engineering",
+      "location": "Denver, CO",
+      "team": "Platform",
+      "allLocations": ["Denver, CO", "Austin, TX"]
+    },
+    "createdAt": 1789300000000,
+    "descriptionPlain": "Build internal tools used by every team.",
+    "description": "<div>Build internal tools used by every team.</div>",
+    "id": "5c0f6a6e-1b4f-4d2a-9c35-0a6f2c7f9e11",
+    "lists": [
+      { "text": "Requirements", "content": "<li>Pursuing a BS in CS</li><li>Graduating 2028</li>" }
+    ],
+    "text": "Platform Engineer",
+    "country": "US",
+    "workplaceType": "hybrid",
+    "hostedUrl": "https://jobs.lever.co/globex/5c0f6a6e-1b4f-4d2a-9c35-0a6f2c7f9e11",
+    "applyUrl": "https://jobs.lever.co/globex/5c0f6a6e-1b4f-4d2a-9c35-0a6f2c7f9e11/apply",
+    "salaryRange": { "currency": "USD", "interval": "per-hour-wage", "min": 40, "max": 48 },
+    "salaryDescriptionPlain": "$40–$48 per hour"
+  },
+  {
+    "categories": { "commitment": "Full-time", "department": "Sales", "location": "Remote", "team": "AE" },
+    "createdAt": 1789000000000,
+    "descriptionPlain": "Close deals.",
+    "id": "9a9a9a9a-1111-2222-3333-444455556666",
+    "lists": [],
+    "text": "Account Executive",
+    "workplaceType": "remote",
+    "hostedUrl": "https://jobs.lever.co/globex/9a9a9a9a-1111-2222-3333-444455556666",
+    "applyUrl": "https://jobs.lever.co/globex/9a9a9a9a-1111-2222-3333-444455556666/apply"
+  }
+]

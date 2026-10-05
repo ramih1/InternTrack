@@ -1,0 +1,143 @@
+[
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Truveta",
+    "id": "9d21429a-ec03-4ab5-8c5f-dccc28783311",
+    "title": "Engineering",
+    "active": true,
+    "terms": [
+      "Summer 2026"
+    ],
+    "date_updated": 1771987584,
+    "date_posted": 1771987584,
+    "url": "https://job-boards.greenhouse.io/truveta/jobs/5659745004",
+    "locations": [
+      "Seattle, WA"
+    ],
+    "company_url": "https://simplify.jobs/c/Truveta",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": [
+      "Bachelor's",
+      "Master's"
+    ]
+  },
+  {
+    "date_updated": 1771948191,
+    "sponsorship": "Other",
+    "active": true,
+    "degrees": [
+      "Bachelor's"
+    ],
+    "url": "https://jobs.lever.co/multiplylabs/acca98ab-c206-4f71-b7a5-6977e4828586",
+    "company_name": "Multiply Labs",
+    "title": "Robotics Software Intern",
+    "locations": [
+      "San Francisco, CA"
+    ],
+    "terms": [
+      "Summer 2026"
+    ],
+    "category": "Software Engineering",
+    "source": "natalieh235",
+    "id": "97e90df1-ce3c-402c-b01a-191b722209e1",
+    "date_posted": 1771948191,
+    "company_url": "",
+    "is_visible": true
+  },
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Exa Labs",
+    "id": "35fa2d9c-f299-480e-9fe2-b35b1808c7aa",
+    "title": "Software Engineer Intern",
+    "active": true,
+    "terms": [
+      "Summer 2026"
+    ],
+    "date_updated": 1770707738,
+    "date_posted": 1770707738,
+    "url": "https://jobs.ashbyhq.com/exa/a9e01521-66f1-481b-89da-ec01d4620f16/application",
+    "locations": [
+      "SF"
+    ],
+    "company_url": "https://simplify.jobs/c/Exa-Labs",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": [
+      "Bachelor's"
+    ]
+  },
+  {
+    "source": "Simplify",
+    "category": "Hardware",
+    "company_name": "GE Aerospace",
+    "id": "ea8a7a43-d2ba-4e7f-b5e9-a8a86b8e1946",
+    "title": "Engines Engineering Intern/Co-op - Computer or Software Engineering",
+    "active": true,
+    "terms": [
+      "Spring 2027"
+    ],
+    "date_updated": 1772496425,
+    "date_posted": 1772496425,
+    "url": "https://geaerospace.wd5.myworkdayjobs.com/ge_externalsite/job/Evendale/Engines-Engineering-Co-op---Computer-or-Software-Engineering---US---Spring-2027_R5029619",
+    "locations": [
+      "Saugus, MA",
+      "Sharonville, OH"
+    ],
+    "company_url": "https://simplify.jobs/c/GE-Aerospace",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": [
+      "Bachelor's",
+      "Master's"
+    ]
+  },
+  {
+    "source": "Simplify",
+    "category": "Product",
+    "company_name": "Warner Bros.",
+    "id": "1bca7197-56ce-4628-b228-dcd9c4fa9455",
+    "title": "WB Games Product Management Intern: LA - Summer 2026",
+    "active": false,
+    "terms": [
+      "Summer 2026"
+    ],
+    "date_updated": 1770506784,
+    "date_posted": 1770506784,
+    "url": "https://warnerbros.wd5.myworkdayjobs.com/global/job/CA-Burbank-Bldg-750-Second-Century-Tower-2/WB-Games-Product-Management-Intern--LA---Summer-2026_R000102702",
+    "locations": [
+      "Burbank, CA"
+    ],
+    "company_url": "https://simplify.jobs/c/Warner-Bros",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": [
+      "Bachelor's"
+    ]
+  },
+  {
+    "date_updated": 1774263255,
+    "sponsorship": "Other",
+    "active": true,
+    "degrees": [
+      "Bachelor's"
+    ],
+    "url": "https://job-boards.greenhouse.io/genevatrading/jobs/5085231007",
+    "company_name": "Geneva Trading",
+    "title": "Junior Software Engineer",
+    "locations": [
+      "Chicago, IL"
+    ],
+    "terms": [
+      "Summer 2026"
+    ],
+    "category": "Software Engineering",
+    "source": "AlmondCroffle",
+    "id": "58821bd1-bd22-45bf-82f0-c375329b1523",
+    "date_posted": 1774263048,
+    "company_url": "",
+    "is_visible": false
+  }
+]
