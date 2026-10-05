@@ -145,7 +145,7 @@ describe("normalizeHeuristic", () => {
         }),
       ],
     );
-    expect(n.locations).toEqual(["New York, NY", "Remote in USA"]);
+    expect(n.locations).toEqual(["New York, NY", "Remote (US)"]);
     expect(n.terms).toEqual(["Summer 2027"]);
     expect(n.remote_type).toBe("hybrid");
     expect(n.field).toBe("software");

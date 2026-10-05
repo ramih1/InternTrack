@@ -80,6 +80,23 @@ export function hasActiveFilters(f: JobFilters): boolean {
   );
 }
 
+const LOCATION_QUERY_ALIASES: Record<string, string> = {
+  nyc: "new york",
+  "new york city": "new york",
+  sf: "san francisco",
+  "bay area": "ca",
+  la: "los angeles",
+  dc: "washington, dc",
+  usa: "us",
+  "united states": "us",
+};
+
+/** Maps common shorthand in a location search to the form stored in `locations_search`. */
+export function normalizeLocationQuery(input: string): string {
+  const q = input.trim().toLowerCase().replace(/\./g, "").replace(/\s+/g, " ");
+  return LOCATION_QUERY_ALIASES[q] ?? q;
+}
+
 /** Escapes LIKE wildcards in user input. */
 export function likePattern(input: string): string {
   return `%${input.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;

@@ -8,7 +8,7 @@ import {
   sponsorshipFromLabel,
   sortTerms,
 } from "../classify";
-import { uniq } from "../text";
+import { canonicalLocation, uniq } from "../text";
 import type { NormalizedJob, RawPosting } from "../types";
 
 /**
@@ -17,7 +17,7 @@ import type { NormalizedJob, RawPosting } from "../types";
  */
 export function normalizeHeuristic(primary: RawPosting, others: RawPosting[] = []): NormalizedJob {
   const all = [primary, ...others];
-  const locations = uniq(all.flatMap((p) => p.locations));
+  const locations = uniq(all.flatMap((p) => p.locations).map(canonicalLocation));
   const description = primary.descriptionText ?? "";
   const hintTerms = normalizeTermLabels(all.flatMap((p) => p.termsHint ?? []));
   const terms = sortTerms(

@@ -23,7 +23,10 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[id]">)
 
   const eligibility = (job.eligibility_json ?? {}) as Partial<Eligibility>;
   const pay = formatPay(job);
-  const sources = [...job.job_sources].sort((a, b) => Number(b.is_active) - Number(a.is_active));
+  // One entry per distinct link, active sources first.
+  const sources = [...job.job_sources]
+    .sort((a, b) => Number(b.is_active) - Number(a.is_active))
+    .filter((s, i, all) => all.findIndex((o) => o.url === s.url) === i);
   const applyUrl = sources.find((s) => s.is_active)?.apply_url ?? sources[0]?.url;
 
   const facts: Array<[string, React.ReactNode]> = [
@@ -145,17 +148,22 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[id]">)
             <h2 className="mb-2 text-sm font-medium">
               Found on {sources.length} {sources.length === 1 ? "source" : "sources"}
             </h2>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-3 text-sm">
               {sources.map((s) => (
                 <li key={s.id} className="flex items-start justify-between gap-2">
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-                  >
-                    {SOURCE_LABELS[s.source_type]} <ExternalLink className="size-3" aria-hidden />
-                  </a>
+                  <div className="min-w-0">
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 break-all underline-offset-4 hover:underline"
+                    >
+                      {hostOf(s.url)} <ExternalLink className="size-3 shrink-0" aria-hidden />
+                    </a>
+                    <p className="text-muted-foreground text-xs">
+                      via {SOURCE_LABELS[s.source_type]}
+                    </p>
+                  </div>
                   {!s.is_active && <Badge variant="outline">Removed</Badge>}
                 </li>
               ))}
@@ -168,4 +176,12 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[id]">)
       </div>
     </article>
   );
+}
+
+function hostOf(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }

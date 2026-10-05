@@ -10,7 +10,7 @@ import {
   normalizeTermLabels,
   sponsorshipFromLabel,
 } from "../classify";
-import { cleanUrl, htmlToText, slugify, splitLocations } from "../text";
+import { canonicalLocation, cleanUrl, htmlToText, slugify, splitLocations } from "../text";
 
 describe("isStudentRole", () => {
   it.each([
@@ -151,5 +151,13 @@ describe("text helpers", () => {
     expect(cleanUrl("https://jobs.lever.co/a/b?utm_source=Simplify&ref=Simplify&x=1")).toBe(
       "https://jobs.lever.co/a/b?x=1",
     );
+  });
+  it("canonicalLocation expands community-list shorthand", () => {
+    expect(canonicalLocation("NYC")).toBe("New York, NY");
+    expect(canonicalLocation("SF")).toBe("San Francisco, CA");
+    expect(canonicalLocation("South SF")).toBe("South San Francisco, CA");
+    expect(canonicalLocation("Remote in USA")).toBe("Remote (US)");
+    expect(canonicalLocation("Remote in Canada")).toBe("Remote (Canada)");
+    expect(canonicalLocation("  Austin,  TX ")).toBe("Austin, TX");
   });
 });

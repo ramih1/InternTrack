@@ -95,3 +95,26 @@ export function cleanUrl(raw: string): string {
     return raw;
   }
 }
+
+const LOCATION_ALIASES: Record<string, string> = {
+  nyc: "New York, NY",
+  "new york city": "New York, NY",
+  sf: "San Francisco, CA",
+  "south sf": "South San Francisco, CA",
+  la: "Los Angeles, CA",
+  dc: "Washington, DC",
+  "washington dc": "Washington, DC",
+};
+
+/** Expands shorthand used by community lists ("NYC", "SF", "Remote in USA") to full names. */
+export function canonicalLocation(raw: string): string {
+  const loc = raw.trim().replace(/\s+/g, " ");
+  const alias = LOCATION_ALIASES[loc.toLowerCase().replace(/\./g, "")];
+  if (alias) return alias;
+  const remote = loc.match(/^remote (?:in|-|–)\s*(.+)$/i);
+  if (remote) {
+    const where = remote[1].trim();
+    return `Remote (${/^(usa|united states|us)$/i.test(where) ? "US" : where})`;
+  }
+  return loc;
+}

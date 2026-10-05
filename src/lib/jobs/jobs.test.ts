@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { filtersToQuery, likePattern, parseJobFilters, upcomingTerms } from "./filters";
+import {
+  filtersToQuery,
+  likePattern,
+  normalizeLocationQuery,
+  parseJobFilters,
+  upcomingTerms,
+} from "./filters";
 import { formatPay, formatRelativeDate } from "./format";
 
 describe("parseJobFilters", () => {
@@ -92,5 +98,13 @@ describe("formatRelativeDate", () => {
     expect(formatRelativeDate("2026-10-04T01:00:00Z", now)).toBe("yesterday");
     expect(formatRelativeDate("2026-09-30T12:00:00Z", now)).toBe("5 days ago");
     expect(formatRelativeDate("2026-09-01T12:00:00Z", now)).toBe("4 weeks ago");
+  });
+});
+
+describe("normalizeLocationQuery", () => {
+  it("maps shorthand to stored names", () => {
+    expect(normalizeLocationQuery(" NYC ")).toBe("new york");
+    expect(normalizeLocationQuery("S.F.")).toBe("san francisco");
+    expect(normalizeLocationQuery("Toronto")).toBe("toronto");
   });
 });
