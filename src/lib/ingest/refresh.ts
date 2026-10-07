@@ -212,6 +212,15 @@ async function syncSeedCompanies(supabase: AdminClient, seed: SeedCompany[]) {
     { onConflict: "slug" },
   );
   if (upsertErr) throw upsertErr;
+
+  // Companies removed from the seed list stay in the table (their jobs remain) but are no
+  // longer treated as seeded.
+  const { error: unflagErr } = await supabase
+    .from("companies")
+    .update({ in_seed_list: false })
+    .eq("in_seed_list", true)
+    .not("slug", "in", `(${seed.map((c) => c.slug).join(",")})`);
+  if (unflagErr) throw unflagErr;
 }
 
 class CompanyIndex {
@@ -569,7 +578,9 @@ async function normalizeBacklog(
 ) {
   const { data: rows, error } = await supabase
     .from("jobs")
-    .select("*, companies(name), job_sources(url)")
+    .select(
+      "id, title, locations, remote_type, employment_type, field, terms, duration, pay_text, pay_min, pay_max, pay_currency, pay_period, deadline, eligibility_json, summary, description, posted_at, posted_at_source, companies(name), job_sources(url)",
+    )
     .eq("status", "open")
     .is("ai_normalized_at", null)
     .not("description", "is", null)

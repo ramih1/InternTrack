@@ -231,13 +231,6 @@
     "atsSlug": "elastic"
   },
   {
-    "name": "Grammarly",
-    "slug": "grammarly",
-    "domain": "grammarly.com",
-    "ats": "greenhouse",
-    "atsSlug": "grammarly"
-  },
-  {
     "name": "Nuro",
     "slug": "nuro",
     "domain": "nuro.ai",
@@ -304,8 +297,8 @@
     "name": "Applied Intuition",
     "slug": "applied-intuition",
     "domain": "appliedintuition.com",
-    "ats": "greenhouse",
-    "atsSlug": "appliedintuition"
+    "ats": "ashby",
+    "atsSlug": "applied"
   },
   {
     "name": "Axon",
@@ -329,13 +322,6 @@
     "atsSlug": "flyzipline"
   },
   {
-    "name": "Aurora",
-    "slug": "aurora",
-    "domain": "aurora.tech",
-    "ats": "greenhouse",
-    "atsSlug": "aurorainnovation"
-  },
-  {
     "name": "Vercel",
     "slug": "vercel",
     "domain": "vercel.com",
@@ -348,13 +334,6 @@
     "domain": "glean.com",
     "ats": "greenhouse",
     "atsSlug": "gleanwork"
-  },
-  {
-    "name": "HubSpot",
-    "slug": "hubspot",
-    "domain": "hubspot.com",
-    "ats": "greenhouse",
-    "atsSlug": "hubspot"
   },
   {
     "name": "Zscaler",
@@ -371,13 +350,6 @@
     "atsSlug": "doordashusa"
   },
   {
-    "name": "Postman",
-    "slug": "postman",
-    "domain": "postman.com",
-    "ats": "greenhouse",
-    "atsSlug": "postman"
-  },
-  {
     "name": "Celonis",
     "slug": "celonis",
     "domain": "celonis.com",
@@ -390,13 +362,6 @@
     "domain": "intercom.com",
     "ats": "greenhouse",
     "atsSlug": "intercom"
-  },
-  {
-    "name": "Marqeta",
-    "slug": "marqeta",
-    "domain": "marqeta.com",
-    "ats": "greenhouse",
-    "atsSlug": "marqeta"
   },
   {
     "name": "Nextdoor",
@@ -574,20 +539,6 @@
     "atsSlug": "gopuff"
   },
   {
-    "name": "Kiva",
-    "slug": "kiva",
-    "domain": "kiva.org",
-    "ats": "lever",
-    "atsSlug": "kiva"
-  },
-  {
-    "name": "Weave",
-    "slug": "weave",
-    "domain": "getweave.com",
-    "ats": "lever",
-    "atsSlug": "weave"
-  },
-  {
     "name": "OpenAI",
     "slug": "openai",
     "domain": "openai.com",
@@ -665,13 +616,6 @@
     "atsSlug": "modal"
   },
   {
-    "name": "Retool",
-    "slug": "retool",
-    "domain": "retool.com",
-    "ats": "ashby",
-    "atsSlug": "retool"
-  },
-  {
     "name": "Vanta",
     "slug": "vanta",
     "domain": "vanta.com",
@@ -747,13 +691,6 @@
     "domain": "decagon.ai",
     "ats": "ashby",
     "atsSlug": "decagon"
-  },
-  {
-    "name": "Whatnot",
-    "slug": "whatnot",
-    "domain": "whatnot.com",
-    "ats": "ashby",
-    "atsSlug": "whatnot"
   },
   {
     "name": "Confluent",
