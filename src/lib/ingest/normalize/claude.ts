@@ -1,12 +1,20 @@
-import Anthropic from "@anthropic-ai/sdk";
+import type Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
+
+import {
+  apiFailure,
+  CLAUDE_MODEL,
+  fallbackParams,
+  getAnthropic,
+  type ClaudeFailure,
+} from "@/lib/ai/client";
 
 import { sortTerms } from "../classify";
 import { truncate, uniq } from "../text";
 import type { NormalizedJob } from "../types";
 
-export const NORMALIZE_MODEL = "claude-opus-5-5";
+export const NORMALIZE_MODEL = CLAUDE_MODEL;
 
 /** Structured output schema for one listing (PLAN.md §1.1 fields). */
 export const ListingSchema = z.object({
@@ -82,14 +90,7 @@ export interface ClaudeNormalizeInput {
 }
 
 export type ClaudeNormalizeResult =
-  | { ok: true; job: ListingOutput; usage: Anthropic.Beta.BetaUsage }
-  | { ok: false; reason: "refusal" | "max_tokens" | "parse_error" | "api_error"; detail?: string };
-
-let client: Anthropic | null = null;
-function getClient() {
-  client ??= new Anthropic({ maxRetries: 3, timeout: 120_000 });
-  return client;
-}
+  { ok: true; job: ListingOutput; usage: Anthropic.Beta.BetaUsage } | ClaudeFailure;
 
 export async function normalizeWithClaude(
   input: ClaudeNormalizeInput,
@@ -110,11 +111,10 @@ export async function normalizeWithClaude(
   ].join("\n");
 
   try {
-    const response = await getClient().beta.messages.parse({
+    const response = await getAnthropic().beta.messages.parse({
+      ...fallbackParams(),
       model: NORMALIZE_MODEL,
       max_tokens: 8000,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
       system: SYSTEM_PROMPT,
       output_config: { effort: "low", format: betaZodOutputFormat(ListingSchema) },
       messages: [{ role: "user", content: userContent }],
@@ -127,10 +127,7 @@ export async function normalizeWithClaude(
     if (!response.parsed_output) return { ok: false, reason: "parse_error" };
     return { ok: true, job: response.parsed_output, usage: response.usage };
   } catch (err) {
-    if (err instanceof Anthropic.APIError) {
-      return { ok: false, reason: "api_error", detail: `${err.status ?? ""} ${err.message}` };
-    }
-    return { ok: false, reason: "api_error", detail: String(err) };
+    return apiFailure(err);
   }
 }
 

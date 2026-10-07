@@ -29,6 +29,16 @@ export async function SiteHeader() {
           <Link href="/jobs" className="hover:text-foreground">
             Job board
           </Link>
+          {email && (
+            <>
+              <Link href="/matches" className="hover:text-foreground">
+                Best matches
+              </Link>
+              <Link href="/resumes" className="hover:text-foreground">
+                Resumes
+              </Link>
+            </>
+          )}
         </nav>
         <div className="ml-auto flex items-center gap-2">
           {email ? (

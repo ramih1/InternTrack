@@ -59,3 +59,14 @@ export function formatDate(isoDate: string): string {
     timeZone: "UTC",
   });
 }
+
+/** "2029-04" → "Apr 2029"; other formats are returned unchanged. */
+export function formatYearMonth(value: string): string {
+  const m = value.match(/^(\d{4})-(\d{2})$/);
+  if (!m) return value;
+  return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, 1)).toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}

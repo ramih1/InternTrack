@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { Building2, CalendarClock, MapPin } from "lucide-react";
 
+import { ScoreBadge } from "@/components/score-badge";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPay, formatRelativeDate } from "@/lib/jobs/format";
 import { EMPLOYMENT_LABELS, FIELD_LABELS, REMOTE_LABELS } from "@/lib/jobs/labels";
 import type { JobListItem } from "@/lib/jobs/queries";
 
-export function JobCard({ job }: { job: JobListItem }) {
+export interface JobCardMatch {
+  score: number;
+  explanation: string;
+}
+
+export function JobCard({ job, match }: { job: JobListItem; match?: JobCardMatch }) {
   const pay = formatPay(job);
   const locations =
     job.locations.length > 3
@@ -26,15 +32,20 @@ export function JobCard({ job }: { job: JobListItem }) {
             {job.companies.name}
           </p>
         </div>
-        <p
-          className="text-muted-foreground shrink-0 text-xs"
-          title={
-            job.posted_at_source === "first_seen" ? "Date first seen by InternTrack" : "Date posted"
-          }
-        >
-          {job.posted_at_source === "first_seen" ? "Seen " : "Posted "}
-          {formatRelativeDate(job.posted_at)}
-        </p>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {match && <ScoreBadge score={match.score} />}
+          <p
+            className="text-muted-foreground text-xs"
+            title={
+              job.posted_at_source === "first_seen"
+                ? "Date first seen by InternTrack"
+                : "Date posted"
+            }
+          >
+            {job.posted_at_source === "first_seen" ? "Seen " : "Posted "}
+            {formatRelativeDate(job.posted_at)}
+          </p>
+        </div>
       </div>
 
       {locations && (
@@ -44,8 +55,12 @@ export function JobCard({ job }: { job: JobListItem }) {
         </p>
       )}
 
-      {job.summary && (
-        <p className="text-muted-foreground mt-2 line-clamp-2 text-sm">{job.summary}</p>
+      {match ? (
+        <p className="mt-2 line-clamp-3 text-sm">{match.explanation}</p>
+      ) : (
+        job.summary && (
+          <p className="text-muted-foreground mt-2 line-clamp-2 text-sm">{job.summary}</p>
+        )
       )}
 
       <div className="mt-3 flex flex-wrap gap-1.5">

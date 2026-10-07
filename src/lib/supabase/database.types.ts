@@ -140,6 +140,7 @@ export type Database = {
           posted_at: string
           posted_at_source: Database["public"]["Enums"]["posted_at_source"]
           remote_type: Database["public"]["Enums"]["remote_type"]
+          search_tsv: unknown
           status: Database["public"]["Enums"]["job_status"]
           summary: string | null
           terms: string[]
@@ -172,6 +173,7 @@ export type Database = {
           posted_at?: string
           posted_at_source?: Database["public"]["Enums"]["posted_at_source"]
           remote_type?: Database["public"]["Enums"]["remote_type"]
+          search_tsv?: unknown
           status?: Database["public"]["Enums"]["job_status"]
           summary?: string | null
           terms?: string[]
@@ -204,6 +206,7 @@ export type Database = {
           posted_at?: string
           posted_at_source?: Database["public"]["Enums"]["posted_at_source"]
           remote_type?: Database["public"]["Enums"]["remote_type"]
+          search_tsv?: unknown
           status?: Database["public"]["Enums"]["job_status"]
           summary?: string | null
           terms?: string[]
@@ -216,6 +219,51 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          created_at: string
+          job_id: string
+          model: string
+          reasons_json: Json
+          resume_id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          job_id: string
+          model: string
+          reasons_json?: Json
+          resume_id: string
+          score: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          job_id?: string
+          model?: string
+          reasons_json?: Json
+          resume_id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
             referencedColumns: ["id"]
           },
         ]
@@ -256,12 +304,72 @@ export type Database = {
         }
         Relationships: []
       }
+      resumes: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          is_default: boolean
+          label: string
+          matched_at: string | null
+          mime_type: string
+          parse_error: string | null
+          parse_status: Database["public"]["Enums"]["resume_parse_status"]
+          parsed_at: string | null
+          parsed_json: Json | null
+          size_bytes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          is_default?: boolean
+          label: string
+          matched_at?: string | null
+          mime_type: string
+          parse_error?: string | null
+          parse_status?: Database["public"]["Enums"]["resume_parse_status"]
+          parsed_at?: string | null
+          parsed_json?: Json | null
+          size_bytes: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          matched_at?: string | null
+          mime_type?: string
+          parse_error?: string | null
+          parse_status?: Database["public"]["Enums"]["resume_parse_status"]
+          parsed_at?: string | null
+          parsed_json?: Json | null
+          size_bytes?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      match_candidates: {
+        Args: { p_limit?: number; p_resume_id: string }
+        Returns: {
+          job_id: string
+          rank: number
+        }[]
+      }
     }
     Enums: {
       ats_type: "greenhouse" | "lever" | "ashby" | "workday" | "other"
@@ -280,6 +388,7 @@ export type Database = {
       job_status: "open" | "closed"
       posted_at_source: "source" | "first_seen"
       remote_type: "remote" | "hybrid" | "onsite" | "unknown"
+      resume_parse_status: "pending" | "parsed" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -424,6 +533,7 @@ export const Constants = {
       job_status: ["open", "closed"],
       posted_at_source: ["source", "first_seen"],
       remote_type: ["remote", "hybrid", "onsite", "unknown"],
+      resume_parse_status: ["pending", "parsed", "failed"],
     },
   },
 } as const

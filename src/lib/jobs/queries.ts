@@ -45,7 +45,9 @@ export async function getJob(id: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("jobs")
-    .select("*, companies(*), job_sources(*)")
+    .select(
+      "id, title, locations, remote_type, employment_type, field, terms, duration, pay_text, pay_min, pay_max, pay_currency, pay_period, posted_at, posted_at_source, deadline, eligibility_json, description, summary, status, last_seen_at, ai_normalized_at, companies(name, slug, domain), job_sources(id, source_type, url, apply_url, is_active)",
+    )
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(`Failed to load job: ${error.message}`);

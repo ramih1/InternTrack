@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import type { Database } from "./database.types";
 
-const PROTECTED_PREFIXES = ["/account"];
+const PROTECTED_PREFIXES = ["/account", "/resumes", "/matches"];
 
 /** Refreshes the Supabase auth session cookie and guards protected routes. */
 export async function updateSession(request: NextRequest) {

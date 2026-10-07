@@ -7,7 +7,7 @@ import {
   parseJobFilters,
   upcomingTerms,
 } from "./filters";
-import { formatPay, formatRelativeDate } from "./format";
+import { formatPay, formatRelativeDate, formatYearMonth } from "./format";
 
 describe("parseJobFilters", () => {
   it("parses valid params", () => {
@@ -106,5 +106,12 @@ describe("normalizeLocationQuery", () => {
     expect(normalizeLocationQuery(" NYC ")).toBe("new york");
     expect(normalizeLocationQuery("S.F.")).toBe("san francisco");
     expect(normalizeLocationQuery("Toronto")).toBe("toronto");
+  });
+});
+
+describe("formatYearMonth", () => {
+  it("formats YYYY-MM and passes other values through", () => {
+    expect(formatYearMonth("2029-04")).toBe("Apr 2029");
+    expect(formatYearMonth("Spring 2029")).toBe("Spring 2029");
   });
 });
