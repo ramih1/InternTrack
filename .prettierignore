@@ -1,0 +1,6 @@
+.next
+node_modules
+package-lock.json
+src/lib/supabase/database.types.ts
+src/lib/ingest/__tests__/fixtures
+PLAN.md

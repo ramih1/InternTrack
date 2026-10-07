@@ -1,0 +1,723 @@
+[
+  {
+    "name": "Stripe",
+    "slug": "stripe",
+    "domain": "stripe.com",
+    "ats": "greenhouse",
+    "atsSlug": "stripe"
+  },
+  {
+    "name": "Airbnb",
+    "slug": "airbnb",
+    "domain": "airbnb.com",
+    "ats": "greenhouse",
+    "atsSlug": "airbnb"
+  },
+  {
+    "name": "Robinhood",
+    "slug": "robinhood",
+    "domain": "robinhood.com",
+    "ats": "greenhouse",
+    "atsSlug": "robinhood"
+  },
+  {
+    "name": "Coinbase",
+    "slug": "coinbase",
+    "domain": "coinbase.com",
+    "ats": "greenhouse",
+    "atsSlug": "coinbase"
+  },
+  {
+    "name": "Databricks",
+    "slug": "databricks",
+    "domain": "databricks.com",
+    "ats": "greenhouse",
+    "atsSlug": "databricks"
+  },
+  {
+    "name": "Figma",
+    "slug": "figma",
+    "domain": "figma.com",
+    "ats": "greenhouse",
+    "atsSlug": "figma"
+  },
+  {
+    "name": "Discord",
+    "slug": "discord",
+    "domain": "discord.com",
+    "ats": "greenhouse",
+    "atsSlug": "discord"
+  },
+  {
+    "name": "Dropbox",
+    "slug": "dropbox",
+    "domain": "dropbox.com",
+    "ats": "greenhouse",
+    "atsSlug": "dropbox"
+  },
+  {
+    "name": "Pinterest",
+    "slug": "pinterest",
+    "domain": "pinterest.com",
+    "ats": "greenhouse",
+    "atsSlug": "pinterest"
+  },
+  {
+    "name": "Lyft",
+    "slug": "lyft",
+    "domain": "lyft.com",
+    "ats": "greenhouse",
+    "atsSlug": "lyft"
+  },
+  {
+    "name": "Reddit",
+    "slug": "reddit",
+    "domain": "reddit.com",
+    "ats": "greenhouse",
+    "atsSlug": "reddit"
+  },
+  {
+    "name": "Instacart",
+    "slug": "instacart",
+    "domain": "instacart.com",
+    "ats": "greenhouse",
+    "atsSlug": "instacart"
+  },
+  {
+    "name": "GitLab",
+    "slug": "gitlab",
+    "domain": "gitlab.com",
+    "ats": "greenhouse",
+    "atsSlug": "gitlab"
+  },
+  {
+    "name": "Cloudflare",
+    "slug": "cloudflare",
+    "domain": "cloudflare.com",
+    "ats": "greenhouse",
+    "atsSlug": "cloudflare"
+  },
+  {
+    "name": "Datadog",
+    "slug": "datadog",
+    "domain": "datadoghq.com",
+    "ats": "greenhouse",
+    "atsSlug": "datadog"
+  },
+  {
+    "name": "MongoDB",
+    "slug": "mongodb",
+    "domain": "mongodb.com",
+    "ats": "greenhouse",
+    "atsSlug": "mongodb"
+  },
+  {
+    "name": "Twitch",
+    "slug": "twitch",
+    "domain": "twitch.tv",
+    "ats": "greenhouse",
+    "atsSlug": "twitch"
+  },
+  {
+    "name": "Roblox",
+    "slug": "roblox",
+    "domain": "roblox.com",
+    "ats": "greenhouse",
+    "atsSlug": "roblox"
+  },
+  {
+    "name": "Asana",
+    "slug": "asana",
+    "domain": "asana.com",
+    "ats": "greenhouse",
+    "atsSlug": "asana"
+  },
+  {
+    "name": "Brex",
+    "slug": "brex",
+    "domain": "brex.com",
+    "ats": "greenhouse",
+    "atsSlug": "brex"
+  },
+  {
+    "name": "Duolingo",
+    "slug": "duolingo",
+    "domain": "duolingo.com",
+    "ats": "greenhouse",
+    "atsSlug": "duolingo"
+  },
+  {
+    "name": "Squarespace",
+    "slug": "squarespace",
+    "domain": "squarespace.com",
+    "ats": "greenhouse",
+    "atsSlug": "squarespace"
+  },
+  {
+    "name": "Affirm",
+    "slug": "affirm",
+    "domain": "affirm.com",
+    "ats": "greenhouse",
+    "atsSlug": "affirm"
+  },
+  {
+    "name": "Chime",
+    "slug": "chime",
+    "domain": "chime.com",
+    "ats": "greenhouse",
+    "atsSlug": "chime"
+  },
+  {
+    "name": "Samsara",
+    "slug": "samsara",
+    "domain": "samsara.com",
+    "ats": "greenhouse",
+    "atsSlug": "samsara"
+  },
+  {
+    "name": "Scale AI",
+    "slug": "scale-ai",
+    "domain": "scale.com",
+    "ats": "greenhouse",
+    "atsSlug": "scaleai"
+  },
+  {
+    "name": "Anduril",
+    "slug": "anduril",
+    "domain": "anduril.com",
+    "ats": "greenhouse",
+    "atsSlug": "andurilindustries"
+  },
+  {
+    "name": "Airtable",
+    "slug": "airtable",
+    "domain": "airtable.com",
+    "ats": "greenhouse",
+    "atsSlug": "airtable"
+  },
+  {
+    "name": "Gusto",
+    "slug": "gusto",
+    "domain": "gusto.com",
+    "ats": "greenhouse",
+    "atsSlug": "gusto"
+  },
+  {
+    "name": "Anthropic",
+    "slug": "anthropic",
+    "domain": "anthropic.com",
+    "ats": "greenhouse",
+    "atsSlug": "anthropic"
+  },
+  {
+    "name": "Okta",
+    "slug": "okta",
+    "domain": "okta.com",
+    "ats": "greenhouse",
+    "atsSlug": "okta"
+  },
+  {
+    "name": "Twilio",
+    "slug": "twilio",
+    "domain": "twilio.com",
+    "ats": "greenhouse",
+    "atsSlug": "twilio"
+  },
+  {
+    "name": "Elastic",
+    "slug": "elastic",
+    "domain": "elastic.co",
+    "ats": "greenhouse",
+    "atsSlug": "elastic"
+  },
+  {
+    "name": "Nuro",
+    "slug": "nuro",
+    "domain": "nuro.ai",
+    "ats": "greenhouse",
+    "atsSlug": "nuro"
+  },
+  {
+    "name": "Waymo",
+    "slug": "waymo",
+    "domain": "waymo.com",
+    "ats": "greenhouse",
+    "atsSlug": "waymo"
+  },
+  {
+    "name": "Verkada",
+    "slug": "verkada",
+    "domain": "verkada.com",
+    "ats": "greenhouse",
+    "atsSlug": "verkada"
+  },
+  {
+    "name": "Flexport",
+    "slug": "flexport",
+    "domain": "flexport.com",
+    "ats": "greenhouse",
+    "atsSlug": "flexport"
+  },
+  {
+    "name": "Toast",
+    "slug": "toast",
+    "domain": "toasttab.com",
+    "ats": "greenhouse",
+    "atsSlug": "toast"
+  },
+  {
+    "name": "Point72",
+    "slug": "point72",
+    "domain": "point72.com",
+    "ats": "greenhouse",
+    "atsSlug": "point72"
+  },
+  {
+    "name": "IMC Trading",
+    "slug": "imc-trading",
+    "domain": "imc.com",
+    "ats": "greenhouse",
+    "atsSlug": "imc"
+  },
+  {
+    "name": "SoFi",
+    "slug": "sofi",
+    "domain": "sofi.com",
+    "ats": "greenhouse",
+    "atsSlug": "sofi"
+  },
+  {
+    "name": "Mercury",
+    "slug": "mercury",
+    "domain": "mercury.com",
+    "ats": "greenhouse",
+    "atsSlug": "mercury"
+  },
+  {
+    "name": "Applied Intuition",
+    "slug": "applied-intuition",
+    "domain": "appliedintuition.com",
+    "ats": "ashby",
+    "atsSlug": "applied"
+  },
+  {
+    "name": "Axon",
+    "slug": "axon",
+    "domain": "axon.com",
+    "ats": "greenhouse",
+    "atsSlug": "axon"
+  },
+  {
+    "name": "Faire",
+    "slug": "faire",
+    "domain": "faire.com",
+    "ats": "greenhouse",
+    "atsSlug": "faire"
+  },
+  {
+    "name": "Zipline",
+    "slug": "zipline",
+    "domain": "flyzipline.com",
+    "ats": "greenhouse",
+    "atsSlug": "flyzipline"
+  },
+  {
+    "name": "Vercel",
+    "slug": "vercel",
+    "domain": "vercel.com",
+    "ats": "greenhouse",
+    "atsSlug": "vercel"
+  },
+  {
+    "name": "Glean",
+    "slug": "glean",
+    "domain": "glean.com",
+    "ats": "greenhouse",
+    "atsSlug": "gleanwork"
+  },
+  {
+    "name": "Zscaler",
+    "slug": "zscaler",
+    "domain": "zscaler.com",
+    "ats": "greenhouse",
+    "atsSlug": "zscaler"
+  },
+  {
+    "name": "DoorDash",
+    "slug": "doordash",
+    "domain": "doordash.com",
+    "ats": "greenhouse",
+    "atsSlug": "doordashusa"
+  },
+  {
+    "name": "Celonis",
+    "slug": "celonis",
+    "domain": "celonis.com",
+    "ats": "greenhouse",
+    "atsSlug": "celonis"
+  },
+  {
+    "name": "Intercom",
+    "slug": "intercom",
+    "domain": "intercom.com",
+    "ats": "greenhouse",
+    "atsSlug": "intercom"
+  },
+  {
+    "name": "Nextdoor",
+    "slug": "nextdoor",
+    "domain": "nextdoor.com",
+    "ats": "greenhouse",
+    "atsSlug": "nextdoor"
+  },
+  {
+    "name": "Peloton",
+    "slug": "peloton",
+    "domain": "onepeloton.com",
+    "ats": "greenhouse",
+    "atsSlug": "peloton"
+  },
+  {
+    "name": "Riot Games",
+    "slug": "riot-games",
+    "domain": "riotgames.com",
+    "ats": "greenhouse",
+    "atsSlug": "riotgames"
+  },
+  {
+    "name": "Epic Games",
+    "slug": "epic-games",
+    "domain": "epicgames.com",
+    "ats": "greenhouse",
+    "atsSlug": "epicgames"
+  },
+  {
+    "name": "Jump Trading",
+    "slug": "jump-trading",
+    "domain": "jumptrading.com",
+    "ats": "greenhouse",
+    "atsSlug": "jumptrading"
+  },
+  {
+    "name": "Hudson River Trading",
+    "slug": "hudson-river-trading",
+    "domain": "hudsonrivertrading.com",
+    "ats": "greenhouse",
+    "atsSlug": "wehrtyou"
+  },
+  {
+    "name": "Optiver",
+    "slug": "optiver",
+    "domain": "optiver.com",
+    "ats": "greenhouse",
+    "atsSlug": "optiverus"
+  },
+  {
+    "name": "Tower Research Capital",
+    "slug": "tower-research-capital",
+    "domain": "tower-research.com",
+    "ats": "greenhouse",
+    "atsSlug": "towerresearchcapital"
+  },
+  {
+    "name": "DRW",
+    "slug": "drw",
+    "domain": "drw.com",
+    "ats": "greenhouse",
+    "atsSlug": "drweng"
+  },
+  {
+    "name": "Five Rings",
+    "slug": "five-rings",
+    "domain": "fiverings.com",
+    "ats": "greenhouse",
+    "atsSlug": "fiveringsllc"
+  },
+  {
+    "name": "Virtu Financial",
+    "slug": "virtu-financial",
+    "domain": "virtu.com",
+    "ats": "greenhouse",
+    "atsSlug": "virtu"
+  },
+  {
+    "name": "Akuna Capital",
+    "slug": "akuna-capital",
+    "domain": "akunacapital.com",
+    "ats": "greenhouse",
+    "atsSlug": "akunacapital"
+  },
+  {
+    "name": "SpaceX",
+    "slug": "spacex",
+    "domain": "spacex.com",
+    "ats": "greenhouse",
+    "atsSlug": "spacex"
+  },
+  {
+    "name": "Neuralink",
+    "slug": "neuralink",
+    "domain": "neuralink.com",
+    "ats": "greenhouse",
+    "atsSlug": "neuralink"
+  },
+  {
+    "name": "Lucid Motors",
+    "slug": "lucid-motors",
+    "domain": "lucidmotors.com",
+    "ats": "greenhouse",
+    "atsSlug": "lucidmotors"
+  },
+  {
+    "name": "Palantir",
+    "slug": "palantir",
+    "domain": "palantir.com",
+    "ats": "lever",
+    "atsSlug": "palantir"
+  },
+  {
+    "name": "Spotify",
+    "slug": "spotify",
+    "domain": "spotify.com",
+    "ats": "lever",
+    "atsSlug": "spotify"
+  },
+  {
+    "name": "Zoox",
+    "slug": "zoox",
+    "domain": "zoox.com",
+    "ats": "lever",
+    "atsSlug": "zoox"
+  },
+  {
+    "name": "Shield AI",
+    "slug": "shield-ai",
+    "domain": "shield.ai",
+    "ats": "lever",
+    "atsSlug": "shieldai"
+  },
+  {
+    "name": "Whoop",
+    "slug": "whoop",
+    "domain": "whoop.com",
+    "ats": "lever",
+    "atsSlug": "whoop"
+  },
+  {
+    "name": "Wealthfront",
+    "slug": "wealthfront",
+    "domain": "wealthfront.com",
+    "ats": "lever",
+    "atsSlug": "wealthfront"
+  },
+  {
+    "name": "Match Group",
+    "slug": "match-group",
+    "domain": "mtch.com",
+    "ats": "lever",
+    "atsSlug": "matchgroup"
+  },
+  {
+    "name": "Mistral AI",
+    "slug": "mistral-ai",
+    "domain": "mistral.ai",
+    "ats": "lever",
+    "atsSlug": "mistral"
+  },
+  {
+    "name": "Outreach",
+    "slug": "outreach",
+    "domain": "outreach.io",
+    "ats": "lever",
+    "atsSlug": "outreach"
+  },
+  {
+    "name": "Gopuff",
+    "slug": "gopuff",
+    "domain": "gopuff.com",
+    "ats": "lever",
+    "atsSlug": "gopuff"
+  },
+  {
+    "name": "OpenAI",
+    "slug": "openai",
+    "domain": "openai.com",
+    "ats": "ashby",
+    "atsSlug": "openai"
+  },
+  {
+    "name": "Notion",
+    "slug": "notion",
+    "domain": "notion.so",
+    "ats": "ashby",
+    "atsSlug": "notion"
+  },
+  {
+    "name": "Ramp",
+    "slug": "ramp",
+    "domain": "ramp.com",
+    "ats": "ashby",
+    "atsSlug": "ramp"
+  },
+  {
+    "name": "Linear",
+    "slug": "linear",
+    "domain": "linear.app",
+    "ats": "ashby",
+    "atsSlug": "linear"
+  },
+  {
+    "name": "Supabase",
+    "slug": "supabase",
+    "domain": "supabase.com",
+    "ats": "ashby",
+    "atsSlug": "supabase"
+  },
+  {
+    "name": "Perplexity",
+    "slug": "perplexity",
+    "domain": "perplexity.ai",
+    "ats": "ashby",
+    "atsSlug": "perplexity"
+  },
+  {
+    "name": "Cursor",
+    "slug": "cursor",
+    "domain": "cursor.com",
+    "ats": "ashby",
+    "atsSlug": "cursor"
+  },
+  {
+    "name": "Replit",
+    "slug": "replit",
+    "domain": "replit.com",
+    "ats": "ashby",
+    "atsSlug": "replit"
+  },
+  {
+    "name": "Cohere",
+    "slug": "cohere",
+    "domain": "cohere.com",
+    "ats": "ashby",
+    "atsSlug": "cohere"
+  },
+  {
+    "name": "Deel",
+    "slug": "deel",
+    "domain": "deel.com",
+    "ats": "ashby",
+    "atsSlug": "deel"
+  },
+  {
+    "name": "Modal",
+    "slug": "modal",
+    "domain": "modal.com",
+    "ats": "ashby",
+    "atsSlug": "modal"
+  },
+  {
+    "name": "Vanta",
+    "slug": "vanta",
+    "domain": "vanta.com",
+    "ats": "ashby",
+    "atsSlug": "vanta"
+  },
+  {
+    "name": "Plaid",
+    "slug": "plaid",
+    "domain": "plaid.com",
+    "ats": "ashby",
+    "atsSlug": "plaid"
+  },
+  {
+    "name": "Snowflake",
+    "slug": "snowflake",
+    "domain": "snowflake.com",
+    "ats": "ashby",
+    "atsSlug": "snowflake"
+  },
+  {
+    "name": "Hex",
+    "slug": "hex",
+    "domain": "hex.tech",
+    "ats": "ashby",
+    "atsSlug": "hex"
+  },
+  {
+    "name": "Clerk",
+    "slug": "clerk",
+    "domain": "clerk.com",
+    "ats": "ashby",
+    "atsSlug": "clerk"
+  },
+  {
+    "name": "PostHog",
+    "slug": "posthog",
+    "domain": "posthog.com",
+    "ats": "ashby",
+    "atsSlug": "posthog"
+  },
+  {
+    "name": "ElevenLabs",
+    "slug": "elevenlabs",
+    "domain": "elevenlabs.io",
+    "ats": "ashby",
+    "atsSlug": "elevenlabs"
+  },
+  {
+    "name": "Runway",
+    "slug": "runway",
+    "domain": "runwayml.com",
+    "ats": "ashby",
+    "atsSlug": "runway"
+  },
+  {
+    "name": "Harvey",
+    "slug": "harvey",
+    "domain": "harvey.ai",
+    "ats": "ashby",
+    "atsSlug": "harvey"
+  },
+  {
+    "name": "Sierra",
+    "slug": "sierra",
+    "domain": "sierra.ai",
+    "ats": "ashby",
+    "atsSlug": "sierra"
+  },
+  {
+    "name": "Decagon",
+    "slug": "decagon",
+    "domain": "decagon.ai",
+    "ats": "ashby",
+    "atsSlug": "decagon"
+  },
+  {
+    "name": "Confluent",
+    "slug": "confluent",
+    "domain": "confluent.io",
+    "ats": "ashby",
+    "atsSlug": "confluent"
+  },
+  {
+    "name": "Benchling",
+    "slug": "benchling",
+    "domain": "benchling.com",
+    "ats": "ashby",
+    "atsSlug": "benchling"
+  },
+  {
+    "name": "Kalshi",
+    "slug": "kalshi",
+    "domain": "kalshi.com",
+    "ats": "ashby",
+    "atsSlug": "kalshi"
+  },
+  {
+    "name": "Neon",
+    "slug": "neon",
+    "domain": "neon.tech",
+    "ats": "ashby",
+    "atsSlug": "neon"
+  }
+]

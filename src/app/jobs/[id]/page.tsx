@@ -1,0 +1,239 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import type { Eligibility } from "@/lib/ingest/types";
+import { formatDate, formatPay, formatRelativeDate } from "@/lib/jobs/format";
+import { EMPLOYMENT_LABELS, FIELD_LABELS, REMOTE_LABELS, SOURCE_LABELS } from "@/lib/jobs/labels";
+import { getJob } from "@/lib/jobs/queries";
+import { getDefaultResumeMatch } from "@/lib/resumes/queries";
+import { ScoreBadge } from "@/components/score-badge";
+import { scoreLabel } from "@/lib/matching/results";
+
+export async function generateMetadata({ params }: PageProps<"/jobs/[id]">): Promise<Metadata> {
+  const job = await getJob((await params).id).catch(() => null);
+  return { title: job ? `${job.title} at ${job.companies?.name}` : "Job not found" };
+}
+
+export default async function JobDetailPage({ params }: PageProps<"/jobs/[id]">) {
+  const job = await getJob((await params).id);
+  if (!job) notFound();
+  const match = await getDefaultResumeMatch(job.id).catch(() => null);
+
+  const eligibility = (job.eligibility_json ?? {}) as Partial<Eligibility>;
+  const pay = formatPay(job);
+  // One entry per distinct link, active sources first.
+  const sources = [...job.job_sources]
+    .sort((a, b) => Number(b.is_active) - Number(a.is_active))
+    .filter((s, i, all) => all.findIndex((o) => o.url === s.url) === i);
+  const applyUrl = sources.find((s) => s.is_active)?.apply_url ?? sources[0]?.url;
+
+  const facts: Array<[string, React.ReactNode]> = [
+    ["Location", job.locations.length ? job.locations.join(" · ") : "Not listed"],
+    ["Work arrangement", REMOTE_LABELS[job.remote_type]],
+    ["Term", job.terms.length ? job.terms.join(", ") : "Not specified"],
+    ["Duration", job.duration ?? "Not specified"],
+    ["Pay", pay ?? "Not listed"],
+    [
+      job.posted_at_source === "first_seen" ? "First seen" : "Posted",
+      `${formatRelativeDate(job.posted_at)}${job.posted_at_source === "first_seen" ? " (by InternTrack)" : ""}`,
+    ],
+    ["Deadline", job.deadline ? formatDate(job.deadline) : "Not listed"],
+  ];
+
+  const eligibilityRows: Array<[string, string | null]> = [
+    ["Year of study", eligibility.years_of_study?.join(", ") || null],
+    ["Majors", eligibility.majors?.join(", ") || null],
+    ["Degree", eligibility.degree_levels?.join(", ") || null],
+    ["Work authorization", eligibility.work_authorization ?? null],
+    [
+      "Visa sponsorship",
+      eligibility.sponsorship === "yes"
+        ? "Offered"
+        : eligibility.sponsorship === "no"
+          ? "Not offered"
+          : null,
+    ],
+    ["Other requirements", eligibility.notes ?? null],
+  ];
+  const knownEligibility = eligibilityRows.filter(([, v]) => v);
+
+  return (
+    <article className="mx-auto max-w-4xl px-4 py-8">
+      <Button asChild variant="ghost" size="sm" className="mb-4 -ml-3">
+        <Link href="/jobs">
+          <ArrowLeft /> Back to job board
+        </Link>
+      </Button>
+
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-muted-foreground text-sm">{job.companies?.name}</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{job.title}</h1>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {job.status === "closed" && <Badge variant="destructive">Closed</Badge>}
+            <Badge variant="secondary">{EMPLOYMENT_LABELS[job.employment_type]}</Badge>
+            {job.field !== "other" && <Badge variant="outline">{FIELD_LABELS[job.field]}</Badge>}
+          </div>
+        </div>
+        {applyUrl && job.status === "open" && (
+          <Button asChild size="lg">
+            <a href={applyUrl} target="_blank" rel="noopener noreferrer">
+              Apply on company site <ExternalLink />
+            </a>
+          </Button>
+        )}
+      </header>
+
+      <div className="mt-8 grid gap-6 md:grid-cols-[1fr_280px]">
+        <div className="space-y-6">
+          {match && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex flex-wrap items-center gap-2 text-base">
+                  Your match <ScoreBadge score={match.score} />
+                  <span className="text-muted-foreground text-sm font-normal">
+                    {scoreLabel(match.score)} · {match.resumeLabel}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <p>{match.reasons.explanation}</p>
+                {match.reasons.matched_skills.length > 0 && (
+                  <div>
+                    <p className="text-muted-foreground mb-1.5 text-xs font-medium">You have</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {match.reasons.matched_skills.map((s) => (
+                        <Badge key={s} variant="secondary">
+                          {s}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {match.reasons.missing_skills.length > 0 && (
+                  <div>
+                    <p className="text-muted-foreground mb-1.5 text-xs font-medium">
+                      Not on your resume
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {match.reasons.missing_skills.map((s) => (
+                        <Badge key={s} variant="outline">
+                          {s}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {match.reasons.eligibility_issues.length > 0 && (
+                  <ul className="text-destructive list-disc space-y-1 pl-5">
+                    {match.reasons.eligibility_issues.map((e) => (
+                      <li key={e}>{e}</li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Sparkles className="size-4" aria-hidden /> AI summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {job.summary ? (
+                <p className="text-sm leading-relaxed">{job.summary}</p>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  A summary hasn&apos;t been generated for this listing yet.
+                </p>
+              )}
+              {job.ai_normalized_at && (
+                <p className="text-muted-foreground mt-3 text-xs">
+                  Generated by Claude from the posting. Check the original listing for details.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {knownEligibility.length > 0 && (
+            <section>
+              <h2 className="mb-2 font-medium">Eligibility</h2>
+              <dl className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-[160px_1fr]">
+                {knownEligibility.map(([k, v]) => (
+                  <div key={k} className="contents">
+                    <dt className="text-muted-foreground">{k}</dt>
+                    <dd>{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+
+          {job.description && (
+            <section>
+              <h2 className="mb-2 font-medium">Job description</h2>
+              <div className="text-muted-foreground max-h-[36rem] overflow-y-auto rounded-lg border p-4 text-sm leading-relaxed whitespace-pre-line">
+                {job.description}
+              </div>
+            </section>
+          )}
+        </div>
+
+        <aside className="space-y-6">
+          <dl className="space-y-3 text-sm">
+            {facts.map(([k, v]) => (
+              <div key={k}>
+                <dt className="text-muted-foreground">{k}</dt>
+                <dd className="font-medium">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <Separator />
+          <section>
+            <h2 className="mb-2 text-sm font-medium">
+              Found on {sources.length} {sources.length === 1 ? "source" : "sources"}
+            </h2>
+            <ul className="space-y-3 text-sm">
+              {sources.map((s) => (
+                <li key={s.id} className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 break-all underline-offset-4 hover:underline"
+                    >
+                      {hostOf(s.url)} <ExternalLink className="size-3 shrink-0" aria-hidden />
+                    </a>
+                    <p className="text-muted-foreground text-xs">
+                      via {SOURCE_LABELS[s.source_type]}
+                    </p>
+                  </div>
+                  {!s.is_active && <Badge variant="outline">Removed</Badge>}
+                </li>
+              ))}
+            </ul>
+            <p className="text-muted-foreground mt-3 text-xs">
+              Last checked {formatRelativeDate(job.last_seen_at)}.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </article>
+  );
+}
+
+function hostOf(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}

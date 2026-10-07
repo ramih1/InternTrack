@@ -1,0 +1,42 @@
+{
+  "jobs": [
+    {
+      "absolute_url": "https://job-boards.greenhouse.io/acme/jobs/7012345",
+      "data_compliance": [],
+      "internal_job_id": 4400001,
+      "location": { "name": "San Francisco, CA; New York, NY" },
+      "metadata": null,
+      "id": 7012345,
+      "updated_at": "2026-09-30T12:01:44-04:00",
+      "requisition_id": "R-1001",
+      "title": "Software Engineering Intern (Summer 2027)",
+      "company_name": "Acme",
+      "first_published": "2026-09-15T09:00:00-04:00",
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Acme builds payments infrastructure.&lt;/p&gt;&lt;/div&gt;&lt;h3&gt;What you&amp;#39;ll do&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;Ship features to production&lt;/li&gt;&lt;li&gt;Pair with senior engineers&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The hourly rate for this role is $50 - $58/hr.&lt;/p&gt;&lt;p&gt;This is a 12-week internship.&lt;/p&gt;",
+      "departments": [{ "id": 1, "name": "Engineering", "child_ids": [], "parent_id": null }],
+      "offices": [{ "id": 10, "name": "San Francisco", "location": "San Francisco, CA", "child_ids": [], "parent_id": null }]
+    },
+    {
+      "absolute_url": "https://job-boards.greenhouse.io/acme/jobs/7012346",
+      "location": { "name": "Remote - US" },
+      "id": 7012346,
+      "updated_at": "2026-09-28T10:00:00-04:00",
+      "title": "Senior Software Engineer, Payments",
+      "first_published": null,
+      "content": "&lt;p&gt;Senior role.&lt;/p&gt;",
+      "departments": [{ "id": 1, "name": "Engineering" }],
+      "offices": []
+    },
+    {
+      "absolute_url": "https://job-boards.greenhouse.io/acme/jobs/7012347",
+      "location": { "name": "" },
+      "id": 7012347,
+      "updated_at": "2026-09-29T10:00:00-04:00",
+      "title": "Data Science Co-op - Fall 2027",
+      "content": "&lt;p&gt;Join our data team for a 4-month co-op.&lt;/p&gt;",
+      "departments": [{ "id": 2, "name": "Data" }],
+      "offices": [{ "id": 11, "name": "Toronto", "location": "Toronto, ON, Canada" }]
+    }
+  ],
+  "meta": { "total": 3 }
+}
