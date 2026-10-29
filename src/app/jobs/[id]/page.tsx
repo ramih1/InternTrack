@@ -81,12 +81,21 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[id]">)
             {job.field !== "other" && <Badge variant="outline">{FIELD_LABELS[job.field]}</Badge>}
           </div>
         </div>
-        {applyUrl && job.status === "open" && (
-          <Button asChild size="lg">
-            <a href={applyUrl} target="_blank" rel="noopener noreferrer">
-              Apply on company site <ExternalLink />
-            </a>
-          </Button>
+        {job.status === "open" && (
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="lg" variant="outline">
+              <Link href={`/jobs/${job.id}/tailor`}>
+                <Sparkles /> Tailor my resume
+              </Link>
+            </Button>
+            {applyUrl && (
+              <Button asChild size="lg">
+                <a href={applyUrl} target="_blank" rel="noopener noreferrer">
+                  Apply on company site <ExternalLink />
+                </a>
+              </Button>
+            )}
+          </div>
         )}
       </header>
 

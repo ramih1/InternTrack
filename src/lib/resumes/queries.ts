@@ -3,10 +3,12 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 
 import type { MatchReasons } from "@/lib/matching/results";
+import type { ResumeReview } from "@/lib/tailor/schema";
+
 import type { ResumeProfile } from "./schema";
 
 const RESUME_COLUMNS =
-  "id, label, file_name, mime_type, size_bytes, parse_status, parse_error, parsed_json, is_default, parsed_at, matched_at, created_at";
+  "id, label, file_name, mime_type, size_bytes, parse_status, parse_error, parsed_json, review_json, reviewed_at, is_default, parsed_at, matched_at, created_at";
 
 export async function listResumes() {
   const supabase = await createClient();
@@ -16,7 +18,11 @@ export async function listResumes() {
     .order("is_default", { ascending: false })
     .order("created_at", { ascending: false });
   if (error) throw new Error(`Failed to load resumes: ${error.message}`);
-  return data.map((r) => ({ ...r, profile: r.parsed_json as ResumeProfile | null }));
+  return data.map((r) => ({
+    ...r,
+    profile: r.parsed_json as ResumeProfile | null,
+    review: r.review_json as ResumeReview | null,
+  }));
 }
 
 export type ResumeListItem = Awaited<ReturnType<typeof listResumes>>[number];

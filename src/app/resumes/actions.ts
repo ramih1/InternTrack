@@ -6,13 +6,14 @@ import { redirect } from "next/navigation";
 import { runMatching } from "@/lib/matching/run";
 import {
   checkResumeFile,
+  kindFromMimeType,
   labelFromFileName,
   MAX_RESUMES_PER_USER,
-  RESUME_MIME_TYPES,
   safeFileName,
   type ResumeKind,
 } from "@/lib/resumes/files";
 import { parseResume } from "@/lib/resumes/parse";
+import { reviewResume } from "@/lib/tailor/generate";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -155,7 +156,7 @@ export async function retryParse(resumeId: string): Promise<ResumeActionState> {
     .from("resumes")
     .download(resume.file_path);
   if (dlError) return { error: `Couldn't read the file: ${dlError.message}` };
-  const kind: ResumeKind = resume.mime_type === RESUME_MIME_TYPES.docx ? "docx" : "pdf";
+  const kind: ResumeKind = kindFromMimeType(resume.mime_type);
   const parsed = await parseAndStore(
     supabase,
     resumeId,
@@ -235,4 +236,47 @@ export async function deleteResume(resumeId: string): Promise<ResumeActionState>
   revalidatePath("/resumes");
   revalidatePath("/matches");
   return { message: "Resume deleted." };
+}
+
+const REVIEW_COOLDOWN_MS = 10 * 60 * 1000;
+
+export async function reviewResumeAction(resumeId: string): Promise<ResumeActionState> {
+  if (!UUID_RE.test(resumeId)) return { error: "Unknown resume." };
+  const { supabase } = await requireUser();
+  const { data: resume, error } = await supabase
+    .from("resumes")
+    .select("file_path, mime_type, parsed_json, reviewed_at")
+    .eq("id", resumeId)
+    .single();
+  if (error) return { error: "Unknown resume." };
+  const since = resume.reviewed_at ? Date.now() - Date.parse(resume.reviewed_at) : Infinity;
+  if (since < REVIEW_COOLDOWN_MS) {
+    return {
+      error: `This resume was just reviewed. Try again in ${Math.ceil((REVIEW_COOLDOWN_MS - since) / 60_000)} min.`,
+    };
+  }
+  const { data: blob, error: dlError } = await supabase.storage
+    .from("resumes")
+    .download(resume.file_path);
+  if (dlError) return { error: `Couldn't read the file: ${dlError.message}` };
+
+  const result = await reviewResume({
+    kind: kindFromMimeType(resume.mime_type),
+    bytes: new Uint8Array(await blob.arrayBuffer()),
+    profileText: JSON.stringify(resume.parsed_json ?? {}),
+  });
+  if (!result.ok) {
+    console.error(`Resume review failed (${resumeId}): ${result.reason} ${result.detail ?? ""}`);
+    return { error: "Reviewing the resume failed. Please try again in a few minutes." };
+  }
+  const { error: updError } = await supabase
+    .from("resumes")
+    .update({
+      review_json: result.review as unknown as Json,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", resumeId);
+  if (updError) return { error: updError.message };
+  revalidatePath("/resumes");
+  return { message: `Review ready: ${result.review.overall_score}/100.` };
 }
