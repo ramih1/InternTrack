@@ -26,7 +26,7 @@ Rules:
 export type ParseResult = { ok: true; profile: ResumeProfile } | ClaudeFailure;
 
 /** Builds the document content block for a resume file. */
-async function resumeContent(
+export async function resumeContent(
   bytes: Uint8Array,
   kind: ResumeKind,
 ): Promise<Anthropic.Beta.BetaContentBlockParam> {
@@ -40,14 +40,18 @@ async function resumeContent(
       },
     };
   }
-  // Claude doesn't read .docx directly; send the extracted text as a plain-text document.
-  const { value } = await mammoth.extractRawText({ buffer: Buffer.from(bytes) });
-  const text = value.trim();
-  if (!text) throw new Error("No text could be extracted from this Word document.");
+  // Claude doesn't read .docx directly, and LaTeX is plain text: send both as text documents.
+  const text = kind === "tex" ? new TextDecoder().decode(bytes) : await docxText(bytes);
+  if (!text.trim()) throw new Error("No text could be extracted from this file.");
   return {
     type: "document",
     source: { type: "text", media_type: "text/plain", data: text.slice(0, 100_000) },
   };
+}
+
+async function docxText(bytes: Uint8Array): Promise<string> {
+  const { value } = await mammoth.extractRawText({ buffer: Buffer.from(bytes) });
+  return value;
 }
 
 export async function parseResume(bytes: Uint8Array, kind: ResumeKind): Promise<ParseResult> {

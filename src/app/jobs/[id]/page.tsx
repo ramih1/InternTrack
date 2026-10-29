@@ -11,9 +11,9 @@ import type { Eligibility } from "@/lib/ingest/types";
 import { formatDate, formatPay, formatRelativeDate } from "@/lib/jobs/format";
 import { EMPLOYMENT_LABELS, FIELD_LABELS, REMOTE_LABELS, SOURCE_LABELS } from "@/lib/jobs/labels";
 import { getJob } from "@/lib/jobs/queries";
-import { getDefaultResumeMatch } from "@/lib/resumes/queries";
-import { ScoreBadge } from "@/components/score-badge";
-import { scoreLabel } from "@/lib/matching/results";
+import { getFitContext } from "@/lib/resumes/queries";
+
+import { FitPanel } from "./fit-panel";
 
 export async function generateMetadata({ params }: PageProps<"/jobs/[id]">): Promise<Metadata> {
   const job = await getJob((await params).id).catch(() => null);
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps<"/jobs/[id]">): Pro
 export default async function JobDetailPage({ params }: PageProps<"/jobs/[id]">) {
   const job = await getJob((await params).id);
   if (!job) notFound();
-  const match = await getDefaultResumeMatch(job.id).catch(() => null);
+  const fit = await getFitContext(job.id);
 
   const eligibility = (job.eligibility_json ?? {}) as Partial<Eligibility>;
   const pay = formatPay(job);
@@ -81,65 +81,27 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[id]">)
             {job.field !== "other" && <Badge variant="outline">{FIELD_LABELS[job.field]}</Badge>}
           </div>
         </div>
-        {applyUrl && job.status === "open" && (
-          <Button asChild size="lg">
-            <a href={applyUrl} target="_blank" rel="noopener noreferrer">
-              Apply on company site <ExternalLink />
-            </a>
-          </Button>
+        {job.status === "open" && (
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="lg" variant="outline">
+              <Link href={`/jobs/${job.id}/tailor`}>
+                <Sparkles /> Tailor my resume
+              </Link>
+            </Button>
+            {applyUrl && (
+              <Button asChild size="lg">
+                <a href={applyUrl} target="_blank" rel="noopener noreferrer">
+                  Apply on company site <ExternalLink />
+                </a>
+              </Button>
+            )}
+          </div>
         )}
       </header>
 
       <div className="mt-8 grid gap-6 md:grid-cols-[1fr_280px]">
         <div className="space-y-6">
-          {match && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex flex-wrap items-center gap-2 text-base">
-                  Your match <ScoreBadge score={match.score} />
-                  <span className="text-muted-foreground text-sm font-normal">
-                    {scoreLabel(match.score)} · {match.resumeLabel}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <p>{match.reasons.explanation}</p>
-                {match.reasons.matched_skills.length > 0 && (
-                  <div>
-                    <p className="text-muted-foreground mb-1.5 text-xs font-medium">You have</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {match.reasons.matched_skills.map((s) => (
-                        <Badge key={s} variant="secondary">
-                          {s}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {match.reasons.missing_skills.length > 0 && (
-                  <div>
-                    <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                      Not on your resume
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {match.reasons.missing_skills.map((s) => (
-                        <Badge key={s} variant="outline">
-                          {s}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {match.reasons.eligibility_issues.length > 0 && (
-                  <ul className="text-destructive list-disc space-y-1 pl-5">
-                    {match.reasons.eligibility_issues.map((e) => (
-                      <li key={e}>{e}</li>
-                    ))}
-                  </ul>
-                )}
-              </CardContent>
-            </Card>
-          )}
+          <FitPanel jobId={job.id} initial={fit.match} state={fit.state} />
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">

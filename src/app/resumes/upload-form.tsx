@@ -25,12 +25,12 @@ export function UploadResumeForm({ disabled }: { disabled?: boolean }) {
     >
       <div className="grid gap-4 sm:grid-cols-[1fr_220px]">
         <div className="space-y-1.5">
-          <Label htmlFor="file">Resume file (PDF or .docx, up to 4 MB)</Label>
+          <Label htmlFor="file">Resume file (PDF, Word .docx or LaTeX .tex)</Label>
           <Input
             id="file"
             name="file"
             type="file"
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept=".pdf,.docx,.tex,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-tex,text/x-tex"
             required
             disabled={disabled || pending}
           />

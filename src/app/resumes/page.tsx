@@ -11,6 +11,7 @@ import { allSkills } from "@/lib/resumes/schema";
 import { createClient } from "@/lib/supabase/server";
 
 import { ResumeActions } from "./resume-actions";
+import { ReviewPanel } from "./review-panel";
 import { UploadResumeForm } from "./upload-form";
 
 export const metadata: Metadata = { title: "Resumes" };
@@ -30,8 +31,9 @@ export default async function ResumesPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Your resumes</h1>
         <p className="text-muted-foreground mt-1">
-          Upload a resume and Claude reads it into a profile, then scores the best-fitting open
-          roles. Your resumes and scores are private to you.
+          Upload a resume and Claude reads it into a profile, rates it, and scores the best-fitting
+          open roles. Tailor it to any job from that job&apos;s page. Your resumes and scores are
+          private to you.
         </p>
       </header>
 
@@ -116,10 +118,12 @@ function ResumeCard({ resume }: { resume: ResumeListItem }) {
             )}
           </div>
         )}
+        {resume.review && <ReviewPanel review={resume.review} reviewedAt={resume.reviewed_at} />}
         <ResumeActions
           resumeId={resume.id}
           isDefault={resume.is_default}
           status={resume.parse_status}
+          hasReview={Boolean(resume.review)}
         />
       </CardContent>
     </Card>

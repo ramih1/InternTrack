@@ -70,3 +70,24 @@ migration and run the Supabase security/performance advisors.
   `http://localhost:3000/**` and `https://*-<your-vercel-scope>.vercel.app/**` to redirect URLs.
 - **Authentication → Providers → Google**: add a Google OAuth client ID/secret; in Google Cloud
   use `https://<project-ref>.supabase.co/auth/v1/callback` as the authorized redirect URI.
+
+## Plans & AI usage limits
+
+AI features are metered in `usage_events` (users can't edit or delete their own events).
+Free-plan limits live in `src/lib/usage/limits.ts`:
+
+| Feature                          | Free plan            |
+| -------------------------------- | -------------------- |
+| Tailor a resume to a job         | 3 per 30 days        |
+| Job fit check (on opening a job) | 10 per 24 hours      |
+| Rate my resume                   | 10-minute cooldown   |
+| Resume upload + parsing          | 5 resumes per person |
+
+Fit scores are only computed when a signed-in user opens a job page. To give an account
+unlimited use (e.g. for testing), set its plan with the service role in the SQL editor:
+
+```sql
+insert into public.entitlements (user_id, plan, note)
+values ('<auth user id>', 'unlimited', 'tester')
+on conflict (user_id) do update set plan = excluded.plan;
+```
