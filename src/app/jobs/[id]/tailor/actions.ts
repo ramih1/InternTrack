@@ -9,13 +9,14 @@ import { kindFromMimeType } from "@/lib/resumes/files";
 import type { Json } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
 import { tailorResume } from "@/lib/tailor/generate";
+import { limitMessage } from "@/lib/usage/limits";
+import { getPlan, getQuota, recordUsage } from "@/lib/usage/quota";
 
 export interface TailorActionState {
   error?: string;
 }
 
 const UUID_RE = /^[0-9a-f-]{36}$/i;
-const DAILY_LIMIT = 20;
 const REGENERATE_COOLDOWN_MS = 10 * 60 * 1000;
 
 export async function generateTailoring(
@@ -36,27 +37,25 @@ export async function generateTailoring(
   if (resumeError) return { error: "Unknown resume." };
   if (resume.parse_status !== "parsed") return { error: "This resume hasn't been read yet." };
 
-  const { data: existing } = await supabase
-    .from("tailored_resumes")
-    .select("generated_at")
-    .eq("resume_id", resumeId)
-    .eq("job_id", jobId)
-    .maybeSingle();
-  if (existing) {
-    const since = Date.now() - Date.parse(existing.generated_at);
-    if (since < REGENERATE_COOLDOWN_MS) {
-      return {
-        error: `You just tailored this. Try again in ${Math.ceil((REGENERATE_COOLDOWN_MS - since) / 60_000)} min.`,
-      };
+  const plan = await getPlan(supabase, userId);
+  if (plan !== "unlimited") {
+    const { data: existing } = await supabase
+      .from("tailored_resumes")
+      .select("generated_at")
+      .eq("resume_id", resumeId)
+      .eq("job_id", jobId)
+      .maybeSingle();
+    if (existing) {
+      const since = Date.now() - Date.parse(existing.generated_at);
+      if (since < REGENERATE_COOLDOWN_MS) {
+        return {
+          error: `You just tailored this. Try again in ${Math.ceil((REGENERATE_COOLDOWN_MS - since) / 60_000)} min.`,
+        };
+      }
     }
   }
-  const { count } = await supabase
-    .from("tailored_resumes")
-    .select("id", { count: "exact", head: true })
-    .gte("generated_at", new Date(Date.now() - 86_400_000).toISOString());
-  if ((count ?? 0) >= DAILY_LIMIT) {
-    return { error: `You can tailor up to ${DAILY_LIMIT} resumes a day. Try again tomorrow.` };
-  }
+  const quota = await getQuota(supabase, userId, "tailor", plan);
+  if (!quota.allowed) return { error: limitMessage("tailor", quota) };
 
   const { data: job, error: jobError } = await supabase
     .from("jobs")
@@ -104,6 +103,7 @@ export async function generateTailoring(
     { onConflict: "resume_id,job_id" },
   );
   if (saveError) return { error: saveError.message };
+  await recordUsage(supabase, userId, "tailor");
   revalidatePath(`/jobs/${jobId}/tailor`);
   return {};
 }

@@ -53,6 +53,30 @@ export type Database = {
         }
         Relationships: []
       }
+      entitlements: {
+        Row: {
+          created_at: string
+          note: string | null
+          plan: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          note?: string | null
+          plan?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          note?: string | null
+          plan?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       job_sources: {
         Row: {
           apply_url: string | null
@@ -411,6 +435,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      usage_events: {
+        Row: {
+          created_at: string
+          id: number
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          kind: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          kind?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

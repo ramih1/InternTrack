@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 
+import type { MatchView } from "@/components/match-panel";
 import type { MatchReasons } from "@/lib/matching/results";
 import type { ResumeReview } from "@/lib/tailor/schema";
 
@@ -56,21 +57,47 @@ export async function listMatches(resumeId: string, minScore: number, page: numb
   };
 }
 
-/** The signed-in user's match for a job against their default resume, if any. */
-export async function getDefaultResumeMatch(jobId: string) {
+export type FitState = "signed_out" | "no_resume" | "ready";
+
+/**
+ * What the job page needs for the fit panel: whether the user can get a fit check, and the
+ * existing match against their default (or newest parsed) resume, if any.
+ */
+export async function getFitContext(
+  jobId: string,
+): Promise<{ state: FitState; match: MatchView | null }> {
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
-  if (!claims?.claims) return null;
-  const { data, error } = await supabase
+  if (!claims?.claims) return { state: "signed_out", match: null };
+  const resume = await primaryResume(supabase);
+  if (!resume) return { state: "no_resume", match: null };
+  const { data } = await supabase
     .from("matches")
-    .select("score, reasons_json, resumes!inner(label, is_default)")
+    .select("score, reasons_json")
+    .eq("resume_id", resume.id)
     .eq("job_id", jobId)
-    .eq("resumes.is_default", true)
     .maybeSingle();
-  if (error || !data) return null;
   return {
-    score: data.score,
-    reasons: data.reasons_json as unknown as MatchReasons,
-    resumeLabel: data.resumes.label,
+    state: "ready",
+    match: data
+      ? {
+          score: data.score,
+          reasons: data.reasons_json as unknown as MatchReasons,
+          resumeLabel: resume.label,
+        }
+      : null,
   };
+}
+
+/** The user's default parsed resume, or their newest parsed one. */
+export async function primaryResume(supabase: Awaited<ReturnType<typeof createClient>>) {
+  const { data } = await supabase
+    .from("resumes")
+    .select("id, label, parsed_json")
+    .eq("parse_status", "parsed")
+    .order("is_default", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data;
 }

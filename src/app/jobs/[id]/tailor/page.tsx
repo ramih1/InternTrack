@@ -10,6 +10,8 @@ import { kindFromMimeType } from "@/lib/resumes/files";
 import { listResumes } from "@/lib/resumes/queries";
 import { createClient } from "@/lib/supabase/server";
 import { getTailoring } from "@/lib/tailor/queries";
+import { FREE_LIMITS, formatResetIn } from "@/lib/usage/limits";
+import { getQuota } from "@/lib/usage/quota";
 
 import { GenerateTailoringButton } from "./generate-button";
 import { TailorView } from "./tailor-view";
@@ -34,6 +36,12 @@ export default async function TailorPage({ params, searchParams }: PageProps<"/j
   const resume =
     resumes.find((r) => r.id === requested) ?? resumes.find((r) => r.is_default) ?? resumes[0];
   const tailoring = resume ? await getTailoring(resume.id, job.id) : null;
+  const quota = await getQuota(supabase, data.claims.sub, "tailor");
+  const quotaNote = quota.unlimited
+    ? "Unlimited tailoring on your plan."
+    : quota.remaining
+      ? `${quota.remaining} of ${FREE_LIMITS.tailor!.count} free tailored resumes left (${FREE_LIMITS.tailor!.label}).`
+      : `You've used your free tailored resumes${quota.resetsAt ? ` — more ${formatResetIn(quota.resetsAt)}` : ""}. Paid plans are coming soon.`;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
@@ -47,6 +55,7 @@ export default async function TailorPage({ params, searchParams }: PageProps<"/j
         <h1 className="text-2xl font-semibold tracking-tight">
           {job.title} <span className="text-muted-foreground">· {job.companies?.name}</span>
         </h1>
+        <p className="text-muted-foreground text-xs">{quotaNote}</p>
       </header>
 
       {!resume ? (

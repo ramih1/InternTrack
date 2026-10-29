@@ -10,7 +10,6 @@ import {
   retryParse,
   reviewResumeAction,
   setDefaultResume,
-  updateMatches,
   type ResumeActionState,
 } from "./actions";
 
@@ -47,17 +46,9 @@ export function ResumeActions({
           <>
             {showViewMatches && (
               <Button asChild size="sm">
-                <Link href={`/matches?resume=${resumeId}`}>View matches</Link>
+                <Link href={`/matches?resume=${resumeId}`}>Jobs I&apos;ve checked</Link>
               </Button>
             )}
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={pending}
-              onClick={() => run("update", () => updateMatches(resumeId))}
-            >
-              {running === "update" ? "Scoring new jobs…" : "Update matches"}
-            </Button>
             {showViewMatches && (
               <Button
                 size="sm"

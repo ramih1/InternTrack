@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { runMatching } from "@/lib/matching/run";
 import {
   checkResumeFile,
   kindFromMimeType,
@@ -22,7 +21,6 @@ export interface ResumeActionState {
   message?: string;
 }
 
-const UPDATE_COOLDOWN_MS = 15 * 60 * 1000;
 const UUID_RE = /^[0-9a-f-]{36}$/i;
 
 async function requireUser() {
@@ -69,23 +67,6 @@ async function parseAndStore(
     .eq("id", resumeId);
   if (error) return { ok: false as const, error: error.message };
   return { ok: true as const };
-}
-
-async function matchAndSummarize(supabase: Supabase, resumeId: string): Promise<ResumeActionState> {
-  try {
-    const stats = await runMatching(supabase, resumeId);
-    if (stats.failedBatches && !stats.scored) {
-      return { error: "Scoring matches failed. Try “Update matches” in a few minutes." };
-    }
-    return {
-      message: stats.scored
-        ? `Scored ${stats.scored} new ${stats.scored === 1 ? "job" : "jobs"}.`
-        : "Your matches are up to date.",
-    };
-  } catch (err) {
-    console.error(err);
-    return { error: "Scoring matches failed. Try “Update matches” in a few minutes." };
-  }
 }
 
 export async function uploadResume(
@@ -137,10 +118,7 @@ export async function uploadResume(
   const parsed = await parseAndStore(supabase, id, bytes, check.kind);
   revalidatePath("/resumes");
   if (!parsed.ok) return { error: parsed.error };
-
-  const result = await matchAndSummarize(supabase, id);
-  revalidatePath("/matches");
-  return result.error ? result : { message: `Resume added. ${result.message}` };
+  return { message: "Resume added. Open any job to see how well you fit it." };
 }
 
 export async function retryParse(resumeId: string): Promise<ResumeActionState> {
@@ -165,30 +143,7 @@ export async function retryParse(resumeId: string): Promise<ResumeActionState> {
   );
   revalidatePath("/resumes");
   if (!parsed.ok) return { error: parsed.error };
-  const result = await matchAndSummarize(supabase, resumeId);
-  revalidatePath("/matches");
-  return result;
-}
-
-export async function updateMatches(resumeId: string): Promise<ResumeActionState> {
-  if (!UUID_RE.test(resumeId)) return { error: "Unknown resume." };
-  const { supabase } = await requireUser();
-  const { data: resume, error } = await supabase
-    .from("resumes")
-    .select("matched_at, parse_status")
-    .eq("id", resumeId)
-    .single();
-  if (error) return { error: "Unknown resume." };
-  if (resume.parse_status !== "parsed") return { error: "This resume hasn't been read yet." };
-  const since = resume.matched_at ? Date.now() - Date.parse(resume.matched_at) : Infinity;
-  if (since < UPDATE_COOLDOWN_MS) {
-    const minutes = Math.ceil((UPDATE_COOLDOWN_MS - since) / 60_000);
-    return { error: `Matches were just updated. Try again in ${minutes} min.` };
-  }
-  const result = await matchAndSummarize(supabase, resumeId);
-  revalidatePath("/resumes");
-  revalidatePath("/matches");
-  return result;
+  return { message: "Resume read. Open any job to see how well you fit it." };
 }
 
 export async function setDefaultResume(resumeId: string): Promise<ResumeActionState> {
