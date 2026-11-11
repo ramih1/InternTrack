@@ -103,6 +103,17 @@ export function checkLatexRevision(original: string, revisedRaw: string): LatexC
   return { ok: true, revised };
 }
 
+/**
+ * Finds the exact source text an edit targets, allowing for a model that copied the line
+ * without its LaTeX escapes (e.g. "40%" for "40\%"). Returns the target unchanged when no
+ * variant is in the source, so `latexTargetProblem` still reports it.
+ */
+export function resolveLatexTarget(source: string, target: string): string {
+  if (countOccurrences(source, target) > 0) return target;
+  const escaped = SPECIALS.reduce((text, c) => escapeUnescaped(text, c), target);
+  return countOccurrences(source, escaped) > 0 ? escaped : target;
+}
+
 /** Why an edit target can't be applied to this source, or null if it can. */
 export function latexTargetProblem(source: string, target: string): string | null {
   const n = countOccurrences(source, target);

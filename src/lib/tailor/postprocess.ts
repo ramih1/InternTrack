@@ -2,7 +2,7 @@ import type { ResumeKind } from "@/lib/resumes/files";
 
 import type { DocxParagraph } from "./docx";
 import { unverifiedTerms } from "./grounding";
-import { checkLatexRevision, latexTargetProblem } from "./latex";
+import { checkLatexRevision, latexTargetProblem, resolveLatexTarget } from "./latex";
 import type { ResumeReview, TailorOutput } from "./schema";
 import type { TailorEdit, TailorResult } from "./types";
 
@@ -33,7 +33,12 @@ export function buildTailorResult(out: TailorOutput, source: TailorSource): Tail
 
   for (const e of out.edits) {
     if (edits.length >= MAX_EDITS) break;
-    const target = source.kind === "docx" ? e.target.trim().toUpperCase() : e.target;
+    const target =
+      source.kind === "docx"
+        ? e.target.trim().toUpperCase()
+        : source.kind === "tex"
+          ? resolveLatexTarget(source.latex ?? "", e.target)
+          : e.target;
     const revised = e.revised.trim();
     if (!target.trim() || !revised || seenTargets.has(target)) continue;
     seenTargets.add(target);

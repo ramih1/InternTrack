@@ -31,7 +31,7 @@ export default async function ResumesPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Your resumes</h1>
         <p className="text-muted-foreground mt-1">
-          Upload a resume and Claude reads it into a profile, rates it, and scores the best-fitting
+          Upload a resume and the AI reads it into a profile, rates it, and scores the best-fitting
           open roles. Tailor it to any job from that job&apos;s page. Your resumes and scores are
           private to you.
         </p>

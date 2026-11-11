@@ -8,9 +8,14 @@ import { Button } from "@/components/ui/button";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { listMatches, listResumes, MATCHES_PAGE_SIZE } from "@/lib/resumes/queries";
 import { createClient } from "@/lib/supabase/server";
+import { getPlan } from "@/lib/usage/quota";
 
 import { JobCard } from "../jobs/job-card";
+import { RefreshMatchesButton } from "./refresh-button";
+
 export const metadata: Metadata = { title: "Best matches" };
+// "Refresh my matches" scores up to MATCH_CANDIDATES jobs in one Server Action.
+export const maxDuration = 300;
 
 const MIN_SCORES = [0, 50, 70, 85] as const;
 
@@ -18,6 +23,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) redirect("/login?next=/matches");
+  const plan = await getPlan(supabase, data.claims.sub);
 
   const params = await searchParams;
   const resumes = (await listResumes()).filter((r) => r.parse_status === "parsed");
@@ -69,8 +75,13 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
           <p className="text-muted-foreground mt-1 text-sm">
             Jobs you&apos;ve opened, ranked by fit with{" "}
             <span className="text-foreground font-medium">{resume.label}</span>. A job is scored
-            when you open it. Scores are Claude&apos;s estimate; always read the posting.
+            when you open it. Scores are an AI estimate; always read the posting.
           </p>
+          {plan === "unlimited" && (
+            <div className="mt-3">
+              <RefreshMatchesButton resumeId={resume.id} />
+            </div>
+          )}
         </div>
         <form action="/matches" method="get" className="flex flex-wrap items-end gap-3">
           {resumes.length > 1 && (

@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { CLAUDE_MODEL } from "@/lib/ai/client";
 import { MATCH_JOB_COLUMNS, type JobForMatching } from "@/lib/matching/brief";
 import { kindFromMimeType } from "@/lib/resumes/files";
 import type { Json } from "@/lib/supabase/database.types";
@@ -87,7 +86,7 @@ export async function generateTailoring(
   if (!result.result.edits.length) {
     return {
       error:
-        "Claude didn't find changes worth making for this job — your resume already fits it well.",
+        "The AI didn't find changes worth making for this job — your resume already fits it well.",
     };
   }
 
@@ -97,7 +96,7 @@ export async function generateTailoring(
       resume_id: resumeId,
       job_id: jobId,
       result_json: result.result as unknown as Json,
-      model: CLAUDE_MODEL,
+      model: result.model,
       generated_at: new Date().toISOString(),
     },
     { onConflict: "resume_id,job_id" },

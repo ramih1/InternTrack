@@ -1,15 +1,7 @@
 import "server-only";
 
-import type Anthropic from "@anthropic-ai/sdk";
-import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
-
-import {
-  apiFailure,
-  CLAUDE_MODEL,
-  fallbackParams,
-  getAnthropic,
-  type ClaudeFailure,
-} from "@/lib/ai/client";
+import type { AiFailure } from "@/lib/ai/client";
+import { generateStructured, type AiPart } from "@/lib/ai/structured";
 import { jobBrief, type JobForMatching } from "@/lib/matching/brief";
 import type { ResumeKind } from "@/lib/resumes/files";
 import { resumeContent } from "@/lib/resumes/parse";
@@ -51,7 +43,7 @@ export interface LoadedResume {
 
 async function tailorSource(resume: LoadedResume): Promise<{
   source: TailorSource;
-  content: Anthropic.Beta.BetaContentBlockParam;
+  content: AiPart;
 }> {
   if (resume.kind === "tex") {
     const latex = new TextDecoder().decode(resume.bytes);
@@ -74,7 +66,7 @@ async function tailorSource(resume: LoadedResume): Promise<{
   };
 }
 
-export type TailorRunResult = { ok: true; result: TailorResult } | ClaudeFailure;
+export type TailorRunResult = { ok: true; result: TailorResult; model: string } | AiFailure;
 
 export async function tailorResume(
   resume: LoadedResume,
@@ -91,41 +83,30 @@ export async function tailorResume(
     };
   }
 
-  try {
-    const response = await getAnthropic().beta.messages.parse({
-      ...fallbackParams(),
-      model: CLAUDE_MODEL,
-      max_tokens: 16000,
-      system: `${TAILOR_SYSTEM}\n\n${FORMAT_RULES[resume.kind]}`,
-      output_config: { effort: "medium", format: betaZodOutputFormat(TailorOutputSchema) },
-      messages: [
-        {
-          role: "user",
-          content: [
-            prepared.content,
-            {
-              type: "text",
-              text: `Tailor the resume for this posting:\n\n${jobBrief(job, "target", 6000)}`,
-            },
-          ],
-        },
-      ],
-    });
-    if (response.stop_reason === "refusal") {
-      return { ok: false, reason: "refusal", detail: response.stop_details?.category ?? undefined };
-    }
-    if (response.stop_reason === "max_tokens") return { ok: false, reason: "max_tokens" };
-    if (!response.parsed_output) return { ok: false, reason: "parse_error" };
-    return { ok: true, result: buildTailorResult(response.parsed_output, prepared.source) };
-  } catch (err) {
-    return apiFailure(err);
-  }
+  const response = await generateStructured({
+    system: `${TAILOR_SYSTEM}\n\n${FORMAT_RULES[resume.kind]}`,
+    schema: TailorOutputSchema,
+    effort: "medium",
+    parts: [
+      prepared.content,
+      {
+        type: "text",
+        text: `Tailor the resume for this posting:\n\n${jobBrief(job, "target", 6000)}`,
+      },
+    ],
+  });
+  if (!response.ok) return response;
+  return {
+    ok: true,
+    result: buildTailorResult(response.data, prepared.source),
+    model: response.model,
+  };
 }
 
-export type ReviewRunResult = { ok: true; review: ResumeReview } | ClaudeFailure;
+export type ReviewRunResult = { ok: true; review: ResumeReview } | AiFailure;
 
 export async function reviewResume(resume: LoadedResume): Promise<ReviewRunResult> {
-  let content: Anthropic.Beta.BetaContentBlockParam;
+  let content: AiPart;
   try {
     content = await resumeContent(resume.bytes, resume.kind);
   } catch (err) {
@@ -135,24 +116,12 @@ export async function reviewResume(resume: LoadedResume): Promise<ReviewRunResul
       detail: err instanceof Error ? err.message : String(err),
     };
   }
-  try {
-    const response = await getAnthropic().beta.messages.parse({
-      ...fallbackParams(),
-      model: CLAUDE_MODEL,
-      max_tokens: 16000,
-      system: REVIEW_SYSTEM,
-      output_config: { effort: "medium", format: betaZodOutputFormat(ReviewSchema) },
-      messages: [
-        { role: "user", content: [content, { type: "text", text: "Review this resume." }] },
-      ],
-    });
-    if (response.stop_reason === "refusal") {
-      return { ok: false, reason: "refusal", detail: response.stop_details?.category ?? undefined };
-    }
-    if (response.stop_reason === "max_tokens") return { ok: false, reason: "max_tokens" };
-    if (!response.parsed_output) return { ok: false, reason: "parse_error" };
-    return { ok: true, review: sanitizeReview(response.parsed_output) };
-  } catch (err) {
-    return apiFailure(err);
-  }
+  const response = await generateStructured({
+    system: REVIEW_SYSTEM,
+    schema: ReviewSchema,
+    effort: "medium",
+    parts: [content, { type: "text", text: "Review this resume." }],
+  });
+  if (!response.ok) return response;
+  return { ok: true, review: sanitizeReview(response.data) };
 }

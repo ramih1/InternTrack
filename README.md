@@ -8,7 +8,10 @@ implements **Milestone 1 (Foundation)** and **Milestone 2 (Job board)**.
 
 - Next.js 16 (App Router) + TypeScript, Tailwind CSS v4, shadcn/ui
 - Supabase (Postgres + Auth with email and Google, RLS on every table)
-- Anthropic TypeScript SDK (`claude-opus-5-5`, structured outputs, effort `low`) for listing normalization
+- Anthropic TypeScript SDK (`claude-opus-5-5`, structured outputs) for listing normalization and,
+  by default, the resume features
+- Optional [Ollama](https://ollama.com) provider (`qwen3.5:4b`) to run the resume features free on
+  your own machine
 - Vitest, ESLint, Prettier; Vercel hosting + Vercel Cron for the daily refresh
 
 ## Getting started
@@ -27,6 +30,26 @@ npm run dev                  # http://localhost:3000
 | `npm run refresh -- --ai-only --ai-max=500` | Only work through the Claude normalization backlog                         |
 | `npm run refresh -- --no-ai`                | Ingest with rule-based normalization only                                  |
 | `npm run verify:companies`                  | Check every ATS slug in `data/companies.json` resolves                     |
+
+### Running the AI features locally for free (Ollama)
+
+Resume parsing, fit checks, "Rate my resume" and tailoring can use a model on your own machine
+instead of the Anthropic API:
+
+1. Install Ollama from <https://ollama.com/download> and start it (the app, or `ollama serve`).
+2. `ollama pull qwen3.5:4b` — about 3.3 GB; fits an 8 GB Mac. On 16 GB+, `qwen3.5:9b` is better.
+3. In `.env.local`: `AI_PROVIDER=ollama` (and `OLLAMA_MODEL` if you pulled another model).
+4. `npm run dev`.
+
+Notes:
+
+- This only works where the app runs next to Ollama (e.g. `npm run dev` on your laptop). The
+  deployed site can't reach your laptop, so production uses `AI_PROVIDER=anthropic`.
+- A 4B model is noticeably weaker than Claude: check tailored edits carefully. Grounding checks
+  (edits must match the real file, new numbers/terms are flagged) apply to both providers.
+- PDFs are sent as their extracted text (scanned PDFs without a text layer won't work).
+- Listing normalization in `npm run refresh` / the cron always uses Claude, since those
+  summaries are shared by every user.
 
 ## How ingestion works (`src/lib/ingest`)
 
@@ -83,8 +106,11 @@ Free-plan limits live in `src/lib/usage/limits.ts`:
 | Rate my resume                   | 10-minute cooldown   |
 | Resume upload + parsing          | 5 resumes per person |
 
-Fit scores are only computed when a signed-in user opens a job page. To give an account
-unlimited use (e.g. for testing), set its plan with the service role in the SQL editor:
+Fit scores are only computed when a signed-in user opens a job page. Accounts on the
+`unlimited` plan also get a **Refresh my matches** button on Best matches, which scores the
+resume against its top `MATCH_CANDIDATES` (default 30) keyword-matched open jobs, skipping jobs
+already scored. To give an account unlimited use (e.g. for testing), set its plan with the
+service role in the SQL editor:
 
 ```sql
 insert into public.entitlements (user_id, plan, note)

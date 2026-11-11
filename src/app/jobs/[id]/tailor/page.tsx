@@ -112,7 +112,7 @@ export default async function TailorPage({ params, searchParams }: PageProps<"/j
           ) : (
             <div className="space-y-4 rounded-xl border p-6">
               <p className="text-muted-foreground text-sm">
-                Claude will compare your resume with this posting and suggest rewrites of your
+                The AI will compare your resume with this posting and suggest rewrites of your
                 existing lines in the job&apos;s language — no invented experience. You choose which
                 edits to keep
                 {kindFromMimeType(resume.mime_type) === "pdf"

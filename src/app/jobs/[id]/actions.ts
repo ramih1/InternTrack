@@ -1,6 +1,5 @@
 "use server";
 
-import { CLAUDE_MODEL } from "@/lib/ai/client";
 import type { MatchView } from "@/components/match-panel";
 import { MATCH_JOB_COLUMNS, type JobForMatching } from "@/lib/matching/brief";
 import type { MatchReasons } from "@/lib/matching/results";
@@ -81,7 +80,7 @@ export async function checkFit(jobId: string): Promise<FitCheckResult> {
       user_id: userId,
       score: r.score,
       reasons_json: r.reasons as unknown as Json,
-      model: CLAUDE_MODEL,
+      model: result.model,
     },
     { onConflict: "resume_id,job_id" },
   );

@@ -183,7 +183,7 @@ export function TailorView({
         <CardContent className="space-y-2 text-sm">
           <p>{result.strategy}</p>
           <p className="text-muted-foreground text-xs">
-            Generated {new Date(generatedAt).toLocaleString()}. Claude only rewords what&apos;s
+            Generated {new Date(generatedAt).toLocaleString()}. The AI only rewords what&apos;s
             already on your resume — review every change before you use it.
           </p>
         </CardContent>

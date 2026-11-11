@@ -55,6 +55,24 @@ describe("buildTailorResult — LaTeX", () => {
     expect(r.fitScoreAfter).toBe(74);
   });
 
+  it("resolves targets the model copied without LaTeX escapes", () => {
+    const tex = String.raw`\resumeItem{Raised test coverage from 40\% to 75\%}`;
+    const r = buildTailorResult(
+      output([
+        edit(
+          "Raised test coverage from 40% to 75%",
+          "Built pytest suites that raised coverage from 40% to 75%",
+        ),
+      ]),
+      { kind: "tex", latex: tex, resumeText: tex },
+    );
+    expect(r.edits[0]).toMatchObject({
+      applicable: true,
+      target: String.raw`Raised test coverage from 40\% to 75\%`,
+      revised: String.raw`Built pytest suites that raised coverage from 40\% to 75\%`,
+    });
+  });
+
   it("marks missing or ambiguous targets as not applicable instead of dropping them", () => {
     const r = buildTailorResult(
       output([

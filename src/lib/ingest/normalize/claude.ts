@@ -7,7 +7,7 @@ import {
   CLAUDE_MODEL,
   fallbackParams,
   getAnthropic,
-  type ClaudeFailure,
+  type AiFailure,
 } from "@/lib/ai/client";
 
 import { sortTerms } from "../classify";
@@ -90,7 +90,7 @@ export interface ClaudeNormalizeInput {
 }
 
 export type ClaudeNormalizeResult =
-  { ok: true; job: ListingOutput; usage: Anthropic.Beta.BetaUsage } | ClaudeFailure;
+  { ok: true; job: ListingOutput; usage: Anthropic.Beta.BetaUsage } | AiFailure;
 
 export async function normalizeWithClaude(
   input: ClaudeNormalizeInput,

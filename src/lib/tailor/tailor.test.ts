@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 
 import { applyDocxEdits, paragraphText, readDocxParagraphs } from "./docx";
 import { unverifiedTerms } from "./grounding";
-import { applyLatexEdits, checkLatexRevision, latexTargetProblem } from "./latex";
+import {
+  applyLatexEdits,
+  checkLatexRevision,
+  latexTargetProblem,
+  resolveLatexTarget,
+} from "./latex";
 
 const TEX = String.raw`\documentclass[letterpaper,11pt]{article}
 \usepackage{titlesec}
@@ -61,6 +66,15 @@ describe("applyLatexEdits", () => {
     expect(applied).toEqual([]);
     expect(skipped.map((s) => s.id)).toEqual(["e1", "e2"]);
     expect(latexTargetProblem(TEX, "\\resumeItem{")).toMatch(/more than once/);
+  });
+
+  it("matches a target copied without its LaTeX escapes", () => {
+    const unescaped = "Wrote React + TypeScript dashboard components; cut load time by 35%";
+    expect(resolveLatexTarget(TEX, unescaped)).toBe(
+      String.raw`Wrote React + TypeScript dashboard components; cut load time by 35\%`,
+    );
+    expect(resolveLatexTarget(TEX, "Built REST APIs")).toBe("Built REST APIs");
+    expect(resolveLatexTarget(TEX, "Not in the file 50%")).toBe("Not in the file 50%");
   });
 });
 
