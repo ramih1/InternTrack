@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
   deleteResume,
   retryParse,
+  reviewResumeAction,
   setDefaultResume,
-  updateMatches,
   type ResumeActionState,
 } from "./actions";
 
@@ -18,11 +18,13 @@ export function ResumeActions({
   isDefault,
   status,
   showViewMatches = true,
+  hasReview = false,
 }: {
   resumeId: string;
   isDefault: boolean;
   status: "pending" | "parsed" | "failed";
   showViewMatches?: boolean;
+  hasReview?: boolean;
 }) {
   const [pending, startTransition] = useTransition();
   const [running, setRunning] = useState<string | null>(null);
@@ -44,17 +46,23 @@ export function ResumeActions({
           <>
             {showViewMatches && (
               <Button asChild size="sm">
-                <Link href={`/matches?resume=${resumeId}`}>View matches</Link>
+                <Link href={`/matches?resume=${resumeId}`}>Jobs I&apos;ve checked</Link>
               </Button>
             )}
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={pending}
-              onClick={() => run("update", () => updateMatches(resumeId))}
-            >
-              {running === "update" ? "Scoring new jobs…" : "Update matches"}
-            </Button>
+            {showViewMatches && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={pending}
+                onClick={() => run("review", () => reviewResumeAction(resumeId))}
+              >
+                {running === "review"
+                  ? "Reviewing… (about 20 seconds)"
+                  : hasReview
+                    ? "Review again"
+                    : "Rate my resume"}
+              </Button>
+            )}
           </>
         )}
         {status !== "parsed" && (

@@ -8,7 +8,7 @@ export const ResumeProfileSchema = z.object({
   full_name: z.string().nullable(),
   headline: z
     .string()
-    .describe('One line, e.g. "Computer science junior focused on backend and ML".'),
+    .describe("One line in your own words: this candidate's program, year and focus."),
   education: z.array(
     z.object({
       school: z.string(),
@@ -23,7 +23,9 @@ export const ResumeProfileSchema = z.object({
   year_of_study: z
     .string()
     .nullable()
-    .describe('e.g. "2nd year", "Junior", "Final year", or null if unclear.'),
+    .describe(
+      'Current year of study, e.g. "2nd year" or "Junior", worked out from today\'s date and the expected graduation; null if unclear.',
+    ),
   majors: z.array(z.string()),
   skills: z.object({
     languages: z.array(z.string()).describe("Programming languages."),

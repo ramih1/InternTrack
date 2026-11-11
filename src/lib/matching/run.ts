@@ -2,13 +2,13 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { CLAUDE_MODEL } from "@/lib/ai/client";
+import { aiProvider, type TokenUsage } from "@/lib/ai/client";
 import { mapLimit } from "@/lib/ingest/fetch";
 import { ResumeProfileSchema } from "@/lib/resumes/schema";
 import type { Database, Json } from "@/lib/supabase/database.types";
 
 import { chunk, MATCH_JOB_COLUMNS, type JobForMatching } from "./brief";
-import { scoreBatch, type TokenUsage } from "./score";
+import { scoreBatch } from "./score";
 
 const BATCH_SIZE = 10;
 
@@ -20,16 +20,18 @@ export interface MatchRunStats {
   usage: TokenUsage;
 }
 
-/** Number of prefiltered jobs sent to Claude per run (cost control). */
-export function candidateLimit(): number {
-  const n = Number(process.env.MATCH_CANDIDATES ?? 30);
-  return Number.isFinite(n) ? Math.min(Math.max(Math.round(n), 10), 100) : 30;
+/** Number of keyword-prefiltered jobs scored per refresh (cost and time control). */
+export function candidateLimit(env: Record<string, string | undefined> = process.env): number {
+  const n = Number(env.MATCH_CANDIDATES);
+  return env.MATCH_CANDIDATES?.trim() && Number.isFinite(n)
+    ? Math.min(Math.max(Math.round(n), 10), 100)
+    : 30;
 }
 
 /**
  * Scores a resume against its best full-text candidates. Runs with the signed-in user's
  * Supabase client, so RLS guarantees the resume and matches belong to them. Jobs already
- * scored for this resume are skipped, so repeated runs only pay for new candidates.
+ * scored for this resume are skipped, so each refresh only pays for new candidates.
  */
 export async function runMatching(
   supabase: SupabaseClient<Database>,
@@ -74,7 +76,9 @@ export async function runMatching(
       .returns<JobForMatching[]>();
     if (jobsError) throw new Error(jobsError.message);
 
-    await mapLimit(chunk(jobs, BATCH_SIZE), 3, async (batch) => {
+    // A local Ollama server handles one request at a time; parallel calls would only queue.
+    const concurrency = aiProvider() === "ollama" ? 1 : 3;
+    await mapLimit(chunk(jobs, BATCH_SIZE), concurrency, async (batch) => {
       const result = await scoreBatch(profile, batch);
       if (!result.ok) {
         stats.failedBatches++;
@@ -93,7 +97,7 @@ export async function runMatching(
           user_id: resume.user_id,
           score: r.score,
           reasons_json: r.reasons as unknown as Json,
-          model: CLAUDE_MODEL,
+          model: result.model,
         })),
         { onConflict: "resume_id,job_id" },
       );

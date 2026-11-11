@@ -53,6 +53,30 @@ export type Database = {
         }
         Relationships: []
       }
+      entitlements: {
+        Row: {
+          created_at: string
+          note: string | null
+          plan: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          note?: string | null
+          plan?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          note?: string | null
+          plan?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       job_sources: {
         Row: {
           apply_url: string | null
@@ -318,6 +342,8 @@ export type Database = {
           parse_status: Database["public"]["Enums"]["resume_parse_status"]
           parsed_at: string | null
           parsed_json: Json | null
+          review_json: Json | null
+          reviewed_at: string | null
           size_bytes: number
           updated_at: string
           user_id: string
@@ -335,6 +361,8 @@ export type Database = {
           parse_status?: Database["public"]["Enums"]["resume_parse_status"]
           parsed_at?: string | null
           parsed_json?: Json | null
+          review_json?: Json | null
+          reviewed_at?: string | null
           size_bytes: number
           updated_at?: string
           user_id: string
@@ -352,8 +380,79 @@ export type Database = {
           parse_status?: Database["public"]["Enums"]["resume_parse_status"]
           parsed_at?: string | null
           parsed_json?: Json | null
+          review_json?: Json | null
+          reviewed_at?: string | null
           size_bytes?: number
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tailored_resumes: {
+        Row: {
+          created_at: string
+          generated_at: string
+          id: string
+          job_id: string
+          model: string
+          result_json: Json
+          resume_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generated_at?: string
+          id?: string
+          job_id: string
+          model: string
+          result_json: Json
+          resume_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generated_at?: string
+          id?: string
+          job_id?: string
+          model?: string
+          result_json?: Json
+          resume_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tailored_resumes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tailored_resumes_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usage_events: {
+        Row: {
+          created_at: string
+          id: number
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          kind: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          kind?: string
           user_id?: string
         }
         Relationships: []

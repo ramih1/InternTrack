@@ -4,7 +4,10 @@ export const MAX_RESUMES_PER_USER = 5;
 export const RESUME_MIME_TYPES = {
   pdf: "application/pdf",
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  tex: "application/x-tex",
 } as const;
+
+export const MAX_TEX_BYTES = 512 * 1024;
 
 export type ResumeKind = keyof typeof RESUME_MIME_TYPES;
 
@@ -27,7 +30,34 @@ export function checkResumeFile(bytes: Uint8Array, fileName: string): FileCheck 
   if (isZip && /\.docx$/i.test(fileName)) {
     return { ok: true, kind: "docx", mimeType: RESUME_MIME_TYPES.docx };
   }
-  return { ok: false, error: "Upload a PDF or Word (.docx) file." };
+  if (/\.tex$/i.test(fileName)) return checkTex(bytes);
+  return { ok: false, error: "Upload a PDF, Word (.docx) or LaTeX (.tex) file." };
+}
+
+/** A .tex resume must be a single, complete UTF-8 LaTeX document. */
+function checkTex(bytes: Uint8Array): FileCheck {
+  if (bytes.byteLength > MAX_TEX_BYTES) {
+    return { ok: false, error: "LaTeX files must be 512 KB or smaller." };
+  }
+  let text: string;
+  try {
+    text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    return { ok: false, error: "The .tex file must be UTF-8 text." };
+  }
+  if (!/\\documentclass/.test(text) || !/\\begin\{document\}/.test(text)) {
+    return {
+      ok: false,
+      error: "Upload the main .tex file (it should contain \\documentclass and \\begin{document}).",
+    };
+  }
+  return { ok: true, kind: "tex", mimeType: RESUME_MIME_TYPES.tex };
+}
+
+export function kindFromMimeType(mimeType: string): ResumeKind {
+  if (mimeType === RESUME_MIME_TYPES.docx) return "docx";
+  if (mimeType === RESUME_MIME_TYPES.tex) return "tex";
+  return "pdf";
 }
 
 /** A display label from a file name: "Jane_Doe_SWE_Resume.pdf" → "Jane Doe SWE Resume". */

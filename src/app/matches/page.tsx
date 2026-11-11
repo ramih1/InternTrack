@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { listMatches, listResumes, MATCHES_PAGE_SIZE } from "@/lib/resumes/queries";
 import { createClient } from "@/lib/supabase/server";
+import { getPlan } from "@/lib/usage/quota";
 
 import { JobCard } from "../jobs/job-card";
-import { ResumeActions } from "../resumes/resume-actions";
+import { RefreshMatchesButton } from "./refresh-button";
 
 export const metadata: Metadata = { title: "Best matches" };
+// "Refresh my matches" scores up to MATCH_CANDIDATES jobs in one Server Action.
 export const maxDuration = 300;
 
 const MIN_SCORES = [0, 50, 70, 85] as const;
@@ -21,6 +23,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) redirect("/login?next=/matches");
+  const plan = await getPlan(supabase, data.claims.sub);
 
   const params = await searchParams;
   const resumes = (await listResumes()).filter((r) => r.parse_status === "parsed");
@@ -30,8 +33,8 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
         <Sparkles className="text-muted-foreground size-8" aria-hidden />
         <h1 className="mt-4 text-xl font-semibold">See your best matches</h1>
         <p className="text-muted-foreground mt-2">
-          Upload a resume and InternTrack scores open internships and co-ops against it, with the
-          skills you match and the ones you&apos;re missing.
+          Upload a resume, then open any job — InternTrack scores how well you fit it, with the
+          skills you match and the ones you&apos;re missing. Your checked jobs collect here.
         </p>
         <Button asChild className="mt-6">
           <Link href="/resumes">
@@ -70,10 +73,15 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Best matches</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Open roles scored against{" "}
-            <span className="text-foreground font-medium">{resume.label}</span>. Scores are
-            Claude&apos;s estimate; always read the posting.
+            Jobs you&apos;ve opened, ranked by fit with{" "}
+            <span className="text-foreground font-medium">{resume.label}</span>. A job is scored
+            when you open it. Scores are an AI estimate; always read the posting.
           </p>
+          {plan === "unlimited" && (
+            <div className="mt-3">
+              <RefreshMatchesButton resumeId={resume.id} />
+            </div>
+          )}
         </div>
         <form action="/matches" method="get" className="flex flex-wrap items-end gap-3">
           {resumes.length > 1 && (
@@ -105,13 +113,6 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
         </form>
       </header>
 
-      <ResumeActions
-        resumeId={resume.id}
-        isDefault={resume.is_default}
-        status="parsed"
-        showViewMatches={false}
-      />
-
       {error && (
         <Alert variant="destructive">
           <AlertCircle />
@@ -122,9 +123,13 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
 
       {result && result.matches.length === 0 && (
         <div className="rounded-xl border border-dashed py-14 text-center">
-          <p className="font-medium">No matches at {minScore}+ yet</p>
+          <p className="font-medium">No checked jobs at {minScore}+ yet</p>
           <p className="text-muted-foreground mt-1 text-sm">
-            Lower the minimum score, or use “Update matches” to score newly posted roles.
+            Lower the minimum score, or{" "}
+            <Link href="/jobs" className="underline underline-offset-4">
+              open jobs on the board
+            </Link>{" "}
+            to check your fit.
           </p>
         </div>
       )}
