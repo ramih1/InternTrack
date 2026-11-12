@@ -8,10 +8,12 @@ import {
   aiProvider,
   apiFailure,
   CLAUDE_MODEL,
+  claudeModelFor,
   fallbackParams,
   getAnthropic,
   ollamaConfig,
   type AiResult,
+  type AiTask,
 } from "./client";
 import { ollamaBody, ollamaText, readOllamaResponse, type AiPart } from "./ollama";
 
@@ -19,6 +21,8 @@ export type { AiPart } from "./ollama";
 export type { AiResult, TokenUsage } from "./client";
 
 export interface StructuredRequest<S extends z.ZodType> {
+  /** Picks the Claude model (see `claudeModelFor`); Ollama runs every task on one model. */
+  task: AiTask;
   system: string;
   parts: AiPart[];
   schema: S;
@@ -61,9 +65,10 @@ async function viaAnthropic<S extends z.ZodType>(
   req: StructuredRequest<S>,
 ): Promise<AiResult<z.infer<S>>> {
   try {
+    const model = claudeModelFor(req.task);
     const response = await getAnthropic().beta.messages.parse({
-      ...fallbackParams(),
-      model: CLAUDE_MODEL,
+      ...(model === CLAUDE_MODEL ? fallbackParams() : {}),
+      model,
       max_tokens: req.maxTokens ?? 16000,
       system: req.system,
       output_config: { effort: req.effort, format: betaZodOutputFormat(req.schema) },

@@ -45,6 +45,7 @@ export async function parseResume(bytes: Uint8Array, kind: ResumeKind): Promise<
   }
 
   const result = await generateStructured({
+    task: "parse",
     system: SYSTEM_PROMPT,
     schema: ResumeProfileSchema,
     effort: "low",

@@ -84,6 +84,7 @@ export async function tailorResume(
   }
 
   const response = await generateStructured({
+    task: "tailor",
     system: `${TAILOR_SYSTEM}\n\n${FORMAT_RULES[resume.kind]}`,
     schema: TailorOutputSchema,
     effort: "medium",
@@ -117,6 +118,7 @@ export async function reviewResume(resume: LoadedResume): Promise<ReviewRunResul
     };
   }
   const response = await generateStructured({
+    task: "review",
     system: REVIEW_SYSTEM,
     schema: ReviewSchema,
     effort: "medium",

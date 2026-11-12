@@ -1,7 +1,17 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-/** Default model for every Claude call in the app (PLAN.md §2.2). */
+/** Default model for Claude calls: listing normalization, tailoring and resume reviews. */
 export const CLAUDE_MODEL = "claude-opus-5-5";
+
+/** Low-cost model for the high-volume calls: resume parsing and job fit checks. */
+export const CLAUDE_FAST_MODEL = "claude-haiku-5-5";
+
+/** The per-user AI features, each routed to a model by cost and how much quality matters. */
+export type AiTask = "parse" | "fit" | "tailor" | "review";
+
+export function claudeModelFor(task: AiTask): string {
+  return task === "parse" || task === "fit" ? CLAUDE_FAST_MODEL : CLAUDE_MODEL;
+}
 
 /** Small model that runs on an 8 GB laptop; override with OLLAMA_MODEL. */
 export const DEFAULT_OLLAMA_MODEL = "qwen3.5:4b";
@@ -48,14 +58,10 @@ export function ollamaConfig(env: Record<string, string | undefined> = process.e
   };
 }
 
-/** The model name stored alongside AI results (matches, tailored resumes). */
-export function aiModelName(): string {
-  return aiProvider() === "ollama" ? `ollama/${ollamaConfig().model}` : CLAUDE_MODEL;
-}
-
 /**
- * Request fields shared by every call: on a safety decline the API re-runs the request on
- * Anthropic's recommended fallback model instead of returning the refusal.
+ * Request fields for Opus calls: on a safety decline the API re-runs the request on
+ * Anthropic's recommended fallback model instead of returning the refusal. Haiku has no
+ * server-side fallback, so its requests omit these.
  */
 export function fallbackParams(): {
   betas: Anthropic.Beta.AnthropicBeta[];

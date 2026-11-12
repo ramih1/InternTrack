@@ -462,6 +462,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ai_usage_last_24h: { Args: never; Returns: number }
       match_candidates: {
         Args: { p_limit?: number; p_resume_id: string }
         Returns: {
