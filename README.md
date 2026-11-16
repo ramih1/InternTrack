@@ -8,8 +8,9 @@ implements **Milestone 1 (Foundation)** and **Milestone 2 (Job board)**.
 
 - Next.js 16 (App Router) + TypeScript, Tailwind CSS v4, shadcn/ui
 - Supabase (Postgres + Auth with email and Google, RLS on every table)
-- Anthropic TypeScript SDK (`claude-opus-5-5`, structured outputs) for listing normalization and,
-  by default, the resume features
+- Anthropic TypeScript SDK with structured outputs: `claude-opus-5-5` for listing normalization,
+  tailoring and resume ratings; `claude-haiku-5-5` for the high-volume resume parsing and job
+  fit checks
 - Optional [Ollama](https://ollama.com) provider (`qwen3.5:4b`) to run the resume features free on
   your own machine
 - Vitest, ESLint, Prettier; Vercel hosting + Vercel Cron for the daily refresh
@@ -99,12 +100,22 @@ migration and run the Supabase security/performance advisors.
 AI features are metered in `usage_events` (users can't edit or delete their own events).
 Free-plan limits live in `src/lib/usage/limits.ts`:
 
-| Feature                          | Free plan            |
-| -------------------------------- | -------------------- |
-| Tailor a resume to a job         | 3 per 30 days        |
-| Job fit check (on opening a job) | 10 per 24 hours      |
-| Rate my resume                   | 10-minute cooldown   |
-| Resume upload + parsing          | 5 resumes per person |
+| Feature                          | Free plan                            | Model     |
+| -------------------------------- | ------------------------------------ | --------- |
+| Tailor a resume to a job         | 3 per 30 days                        | Opus 5.5  |
+| Rate my resume                   | 3 per 30 days (+ 10-minute cooldown) | Opus 5.5  |
+| Job fit check (on opening a job) | 10 per 24 hours                      | Haiku 5.5 |
+| Resume upload + parsing          | 5 resumes kept per person            | Haiku 5.5 |
+
+On top of the per-user limits, **free-plan AI use across the whole site is capped at
+`AI_DAILY_LIMIT` (default 300) per rolling 24 hours**, so many free accounts can't run up the
+bill. Each user counts for at most 20 toward it, and `unlimited` accounts are neither counted
+nor blocked. The total comes from `ai_usage_last_24h()`, which only the service role can call
+(the app uses `SUPABASE_SECRET_KEY`; without it the check is skipped and logged).
+
+Fit checks also apply a rule-based graduation check (`src/lib/matching/eligibility.ts`): when a
+posting's eligibility notes state a graduation window and the resume's graduation date is
+clearly outside it, the score is capped at 40 even if the model missed it.
 
 Fit scores are only computed when a signed-in user opens a job page. Accounts on the
 `unlimited` plan also get a **Refresh my matches** button on Best matches, which scores the

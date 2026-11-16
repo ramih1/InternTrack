@@ -15,6 +15,8 @@ import { parseResume } from "@/lib/resumes/parse";
 import { reviewResume } from "@/lib/tailor/generate";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
+import { limitMessage } from "@/lib/usage/limits";
+import { getQuota, recordUsage } from "@/lib/usage/quota";
 
 export interface ResumeActionState {
   error?: string;
@@ -39,9 +41,10 @@ function friendlyParseError(reason: string, detail?: string) {
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-/** Parses the stored file with Claude and records the result on the resume row. */
+/** Parses the stored file with the AI and records the result on the resume row. */
 async function parseAndStore(
   supabase: Supabase,
+  userId: string,
   resumeId: string,
   bytes: Uint8Array,
   kind: ResumeKind,
@@ -66,6 +69,7 @@ async function parseAndStore(
     })
     .eq("id", resumeId);
   if (error) return { ok: false as const, error: error.message };
+  await recordUsage(supabase, userId, "parse");
   return { ok: true as const };
 }
 
@@ -88,6 +92,8 @@ export async function uploadResume(
   if ((count ?? 0) >= MAX_RESUMES_PER_USER) {
     return { error: `You can keep up to ${MAX_RESUMES_PER_USER} resumes. Delete one first.` };
   }
+  const quota = await getQuota(supabase, userId, "parse");
+  if (!quota.allowed) return { error: limitMessage("parse", quota) };
 
   const id = crypto.randomUUID();
   const path = `${userId}/${id}.${check.kind}`;
@@ -115,7 +121,7 @@ export async function uploadResume(
     return { error: insertError.message };
   }
 
-  const parsed = await parseAndStore(supabase, id, bytes, check.kind);
+  const parsed = await parseAndStore(supabase, userId, id, bytes, check.kind);
   revalidatePath("/resumes");
   if (!parsed.ok) return { error: parsed.error };
   return { message: "Resume added. Open any job to see how well you fit it." };
@@ -123,13 +129,15 @@ export async function uploadResume(
 
 export async function retryParse(resumeId: string): Promise<ResumeActionState> {
   if (!UUID_RE.test(resumeId)) return { error: "Unknown resume." };
-  const { supabase } = await requireUser();
+  const { supabase, userId } = await requireUser();
   const { data: resume, error } = await supabase
     .from("resumes")
     .select("id, file_path, mime_type")
     .eq("id", resumeId)
     .single();
   if (error) return { error: "Unknown resume." };
+  const quota = await getQuota(supabase, userId, "parse");
+  if (!quota.allowed) return { error: limitMessage("parse", quota) };
   const { data: blob, error: dlError } = await supabase.storage
     .from("resumes")
     .download(resume.file_path);
@@ -137,6 +145,7 @@ export async function retryParse(resumeId: string): Promise<ResumeActionState> {
   const kind: ResumeKind = kindFromMimeType(resume.mime_type);
   const parsed = await parseAndStore(
     supabase,
+    userId,
     resumeId,
     new Uint8Array(await blob.arrayBuffer()),
     kind,
@@ -197,7 +206,7 @@ const REVIEW_COOLDOWN_MS = 10 * 60 * 1000;
 
 export async function reviewResumeAction(resumeId: string): Promise<ResumeActionState> {
   if (!UUID_RE.test(resumeId)) return { error: "Unknown resume." };
-  const { supabase } = await requireUser();
+  const { supabase, userId } = await requireUser();
   const { data: resume, error } = await supabase
     .from("resumes")
     .select("file_path, mime_type, parsed_json, reviewed_at")
@@ -210,6 +219,8 @@ export async function reviewResumeAction(resumeId: string): Promise<ResumeAction
       error: `This resume was just reviewed. Try again in ${Math.ceil((REVIEW_COOLDOWN_MS - since) / 60_000)} min.`,
     };
   }
+  const quota = await getQuota(supabase, userId, "review");
+  if (!quota.allowed) return { error: limitMessage("review", quota) };
   const { data: blob, error: dlError } = await supabase.storage
     .from("resumes")
     .download(resume.file_path);
@@ -232,6 +243,10 @@ export async function reviewResumeAction(resumeId: string): Promise<ResumeAction
     })
     .eq("id", resumeId);
   if (updError) return { error: updError.message };
+  await recordUsage(supabase, userId, "review");
   revalidatePath("/resumes");
-  return { message: `Review ready: ${result.review.overall_score}/100.` };
+  const left = quota.remaining === null ? null : quota.remaining - 1;
+  const leftNote =
+    left === null ? "" : ` ${left} free ${left === 1 ? "rating" : "ratings"} left this month.`;
+  return { message: `Review ready: ${result.review.overall_score}/100.${leftNote}` };
 }

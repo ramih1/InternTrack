@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { FREE_LIMITS, formatResetIn, limitMessage, quotaStatus, windowStart } from "./limits";
+import {
+  FREE_LIMITS,
+  formatResetIn,
+  limitMessage,
+  quotaStatus,
+  SITE_LIMIT_MESSAGE,
+  siteDailyLimit,
+  windowStart,
+} from "./limits";
 
 const now = new Date("2026-10-29T12:00:00Z");
 const hoursAgo = (h: number) => new Date(now.getTime() - h * 3_600_000).toISOString();
@@ -10,6 +18,27 @@ describe("free limits", () => {
     expect(FREE_LIMITS.tailor).toMatchObject({ count: 3, windowHours: 720 });
     expect(FREE_LIMITS.fit_check).toMatchObject({ count: 10, windowHours: 24 });
     expect(windowStart(FREE_LIMITS.fit_check!, now).toISOString()).toBe(hoursAgo(24));
+  });
+
+  it("caps resume ratings at 3 per 30 days and leaves parsing to the site-wide limit", () => {
+    expect(FREE_LIMITS.review).toMatchObject({ count: 3, windowHours: 720 });
+    expect(FREE_LIMITS.parse).toBeUndefined();
+  });
+});
+
+describe("site-wide daily limit", () => {
+  it("defaults to 300, can be changed, and 0 turns it off", () => {
+    expect(siteDailyLimit({})).toBe(300);
+    expect(siteDailyLimit({ AI_DAILY_LIMIT: " 50 " })).toBe(50);
+    expect(siteDailyLimit({ AI_DAILY_LIMIT: "0" })).toBeNull();
+    expect(siteDailyLimit({ AI_DAILY_LIMIT: "lots" })).toBe(300);
+    expect(siteDailyLimit({ AI_DAILY_LIMIT: "-1" })).toBe(300);
+  });
+
+  it("explains a site-wide block instead of the user's own limit", () => {
+    const status = { ...quotaStatus("free", "tailor", []), allowed: false, siteLimited: true };
+    expect(limitMessage("tailor", status, now)).toBe(SITE_LIMIT_MESSAGE);
+    expect(limitMessage("parse", status, now)).toBe(SITE_LIMIT_MESSAGE);
   });
 });
 
@@ -42,7 +71,7 @@ describe("quotaStatus", () => {
       allowed: true,
       unlimited: true,
     });
-    expect(quotaStatus("free", "review", many)).toMatchObject({ allowed: true, unlimited: true });
+    expect(quotaStatus("free", "parse", many)).toMatchObject({ allowed: true, unlimited: true });
   });
 });
 

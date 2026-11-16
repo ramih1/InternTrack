@@ -12,7 +12,24 @@ export interface Limit {
 export const FREE_LIMITS: Partial<Record<UsageKind, Limit>> = {
   tailor: { count: 3, windowHours: 30 * 24, label: "3 tailored resumes per 30 days" },
   fit_check: { count: 10, windowHours: 24, label: "10 job fit checks per day" },
+  review: { count: 3, windowHours: 30 * 24, label: "3 resume ratings per 30 days" },
 };
+
+/**
+ * Site-wide cap on free-plan AI uses in a rolling 24 hours, so many free accounts can't run
+ * up the bill. Set AI_DAILY_LIMIT to change it, or to 0 to turn it off.
+ */
+export function siteDailyLimit(
+  env: Record<string, string | undefined> = process.env,
+): number | null {
+  const raw = env.AI_DAILY_LIMIT?.trim();
+  const n = Number(raw);
+  if (!raw || !Number.isFinite(n) || n < 0) return 300;
+  return n === 0 ? null : Math.round(n);
+}
+
+export const SITE_LIMIT_MESSAGE =
+  "InternTrack has reached today's limit for free AI features. Please try again tomorrow.";
 
 export interface QuotaStatus {
   allowed: boolean;
@@ -22,6 +39,8 @@ export interface QuotaStatus {
   remaining: number | null;
   /** When the oldest counted use leaves the window (next slot frees up), if at the limit. */
   resetsAt: string | null;
+  /** Blocked by the site-wide daily limit rather than the user's own. */
+  siteLimited?: boolean;
 }
 
 export function windowStart(limit: Limit, now: Date = new Date()): Date {
@@ -65,6 +84,7 @@ export function formatResetIn(resetsAt: string, now: Date = new Date()): string 
 }
 
 export function limitMessage(kind: UsageKind, status: QuotaStatus, now: Date = new Date()): string {
+  if (status.siteLimited) return SITE_LIMIT_MESSAGE;
   const limit = FREE_LIMITS[kind];
   const when = status.resetsAt ? ` More ${formatResetIn(status.resetsAt, now)}.` : "";
   return `You've used your free ${limit?.label ?? "limit"}.${when} Paid plans with more are coming soon.`;

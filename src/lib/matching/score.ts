@@ -2,9 +2,11 @@ import "server-only";
 
 import type { AiFailure, TokenUsage } from "@/lib/ai/client";
 import { generateStructured } from "@/lib/ai/structured";
+import type { Eligibility } from "@/lib/ingest/types";
 import type { ResumeProfile } from "@/lib/resumes/schema";
 
 import { jobBrief, type JobForMatching } from "./brief";
+import { applyGraduationCheck } from "./eligibility";
 import { MatchBatchSchema, sanitizeScores, type MatchResult } from "./results";
 
 const SYSTEM_PROMPT = `You score how well a student's resume fits internship and co-op postings.
@@ -31,6 +33,7 @@ export async function scoreBatch(
   const jobsBlock = jobs.map((j, i) => jobBrief(j, refs[i])).join("\n\n");
 
   const result = await generateStructured({
+    task: "fit",
     system: SYSTEM_PROMPT,
     schema: MatchBatchSchema,
     effort: "medium",
@@ -45,7 +48,11 @@ export async function scoreBatch(
   const byRef = new Map(refs.map((r, i) => [r, jobs[i].id]));
   return {
     ok: true,
-    results: sanitizeScores(result.data, byRef),
+    results: applyGraduationCheck(
+      sanitizeScores(result.data, byRef),
+      new Map(jobs.map((j) => [j.id, j.eligibility_json as Partial<Eligibility> | null])),
+      profile.graduation,
+    ),
     usage: result.usage,
     model: result.model,
   };
